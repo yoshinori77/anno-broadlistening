@@ -19,7 +19,6 @@ type TooltipProps = {
   colorFunc: ColorFunc;
   position: { x: number; y: number };
   onClose: () => void;
-  isTouch: boolean; // 追加
 };
 
 function Tooltip(props: TooltipProps) {
@@ -32,56 +31,40 @@ function Tooltip(props: TooltipProps) {
     onToggleFavorite,
     colorFunc,
     translator,
-    isTouch, // 追加
   } = props;
 
   const { t } = translator;
 
-  // スタイルを `expanded` と `isTouch` に応じて変更
-  const tooltipStyle: React.CSSProperties = isTouch
-    ? {
-        // タッチデバイスの場合、中央に固定
-        position: 'fixed',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        background: 'rgba(255, 255, 255, 0.95)',
-        padding: '15px',
-        borderRadius: '8px',
-        maxWidth: '300px',
-        zIndex: 1000,
-      }
-    : expanded
-    ? {
-        // PCのクリック時のツールチップスタイル
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        background: 'rgba(255, 255, 255, 0.95)',
-        padding: '20px',
-        borderRadius: '8px',
-        maxWidth: '600px',
-        zIndex: 1000,
-      }
-    : {
-        // PCのホバリング時のツールチップスタイル
-        position: 'absolute',
-        left: position.x,
-        top: position.y,
-        transform: 'translate(10px, -10px)', // カーソルの近くに表示
-        background: 'rgba(255, 255, 255, 0.9)',
-        padding: '10px',
-        borderRadius: '4px',
-        maxWidth: '300px',
-        zIndex: 1000,
-        pointerEvents: 'none', // ホバリング時はマウスイベントを無視
-      };
+  const tooltipStyle: React.CSSProperties = expanded
+  ? {
+      // ツールチップが展開されている場合のスタイル
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+      background: 'rgba(255, 255, 255, 0.95)',
+      padding: '20px',
+      borderRadius: '8px',
+      maxWidth: '600px',
+      zIndex: 1000,
+    }
+  : {
+      // ホバリング時のツールチップスタイル
+      position: 'absolute',
+      left: position.x,
+      top: position.y,
+      transform: 'translate(10px, -10px)', // カーソルの近くに表示
+      background: 'rgba(255, 255, 255, 0.9)',
+      padding: '10px',
+      borderRadius: '4px',
+      maxWidth: '300px',
+      zIndex: 1000,
+      pointerEvents: 'none', // ホバリング時はマウスイベントを無視
+    };
 
   return (
     <>
-      {/* スマホの場合、オーバーレイを表示しない */}
-      {(!isTouch && expanded) && (
+      {(expanded) && (
         <div
           onClick={onClose}
           style={{
@@ -96,8 +79,7 @@ function Tooltip(props: TooltipProps) {
         />
       )}
       <div style={tooltipStyle}>
-        {/* PCのクリック時のみCloseボタンを表示 */}
-        {expanded && !isTouch && (
+        {expanded && (
           <button onClick={onClose} style={{ float: 'right' }}>
             {t('Close')}
           </button>
