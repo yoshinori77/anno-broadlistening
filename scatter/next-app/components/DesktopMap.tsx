@@ -303,8 +303,12 @@ function DesktopMap(props: MapProps) {
     }
     const x = (containerWidth - (dataWidth * scale)) / 2 - (minX * scale);
     const y = (containerHeight - (dataHeight * scale)) / 2 - (minY * scale);
-  
-    setZoomState({ scale, x, y });
+
+    // zoomState が変更される場合のみ setZoomState を呼び出す
+    if (zoomState.scale !== scale || zoomState.x !== x || zoomState.y !== y) {
+      setZoomState({ scale, x, y });
+    }
+
   }, [clusters, dimensions, fullScreen]);
 
   const map_title = extractFirstBracketContent(config.name);
