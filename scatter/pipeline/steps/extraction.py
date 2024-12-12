@@ -54,28 +54,26 @@ logging.basicConfig(level=logging.ERROR)
 
 def extract_batch(batch, prompt, model, workers):
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = [
-            executor.submit(extract_arguments, input, prompt, model)
-            for input in list(batch)
+        futures_with_index = [
+            (i, executor.submit(extract_arguments, input, prompt, model))
+            for i, input in enumerate(batch)
         ]
 
-        done, not_done = concurrent.futures.wait(futures, timeout=30)
+        done, not_done = concurrent.futures.wait([f for _, f in futures_with_index], timeout=30)
+        results = [[] for _ in range(len(batch))]
 
-        results = []
-
-        for future in not_done:
-            if not future.cancelled():
+        for _, future in futures_with_index:
+            if future in not_done and not future.cancelled():
                 future.cancel()
-            results.append([])
 
-        for future in done:
-            try:
-                result = future.result()
-                results.append(result)
-            except Exception as e:
-                logging.error(f"Task {future} failed with error: {e}")
-                results.append([])
-
+        for i, future in futures_with_index:
+            if future in done:
+                try:
+                    result = future.result()
+                    results[i] = result
+                except Exception as e:
+                    logging.error(f"Task {future} failed with error: {e}")
+                    results[i] = []
         return results
 
 
