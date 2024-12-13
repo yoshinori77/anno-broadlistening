@@ -8,7 +8,7 @@ import DesktopMap from "./DesktopMap";
 import Header from "./Header";
 import Appendix from "./Appendix";
 import Outline from "./Outline";
-import { isTouchDevice } from "@/utils";
+import CustomIntroduction from "./CustomIntroduction";
 
 import CustomHeader from "./CustomHeader";
 import AfterAppendix from "./AfterAppendix";
@@ -80,6 +80,7 @@ function Report(props: ReportProps) {
         >
           <h2 className="text-xl my-3 font-bold">{t(config.name)}</h2>
           <h1 className="text-3xl my-3 mb-10">{t(config.question)}</h1>
+          <CustomIntroduction config={config} translator={translator} />
 
           <div id="introduction" className="my-4">
             <div id="big-map">
