@@ -16,17 +16,18 @@ def create_custom_intro(config, total_sampled_num: int):
 
     input_count = len(comments)
     args_count = len(pd.read_csv(args_path))
+    processed_num = min(input_count, config["extraction"]["limit"])
 
     print(f"Input count: {input_count}")
     print(f"Args count: {args_count}")
 
     base_custom_intro = """{intro}
-分析対象となったデータの件数は{input_count}件で、これらのデータに対してOpenAI APIを用いて{args_count}件の意見（議論）を抽出し、クラスタリングを行った。
+分析対象となったデータの件数は{processed_num}件で、これらのデータに対してOpenAI APIを用いて{args_count}件の意見（議論）を抽出し、クラスタリングを行った。
 """
 
     intro = config["intro"]
     custom_intro = base_custom_intro.format(
-        intro=intro, input_count=input_count, args_count=args_count
+        intro=intro, processed_num=processed_num, args_count=args_count
     )
 
     if total_sampled_num < args_count:
