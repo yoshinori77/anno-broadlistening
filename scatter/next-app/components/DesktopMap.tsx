@@ -56,13 +56,16 @@ function DesktopMap(props: MapProps) {
   const dimensions = useAutoResize(props.width, props.height);
   const clusters = useRelativePositions(props.clusters);
   const zoom = useZoom(dimensions, fullScreen);
+  const [highlightText, setHighlightText] = useState<string>('');
   const findPoint = useVoronoiFinder(
     clusters,
     props.comments,
     color,
     zoom,
     dimensions,
-    onlyCluster
+    onlyCluster,
+    undefined,
+    highlightText
   );
   const [tooltip, setTooltip] = useState<Point | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({
@@ -78,9 +81,6 @@ function DesktopMap(props: MapProps) {
   const [minVotes, setMinVotes] = useState(0);
   const [minConsensus, setMinConsensus] = useState(50);
   const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes);
-
-  const [highlightText, setHighlightText] = useState<string>('');
-
   const totalArgs = clusters
   .map((c) => c.arguments.length)
   .reduce((a, b) => a + b, 0);
