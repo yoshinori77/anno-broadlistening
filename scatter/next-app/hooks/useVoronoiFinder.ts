@@ -30,7 +30,8 @@ const useVoronoiFinder = (
       height,
     })(points);
     return (mouseEvent: any) => {
-      const rect = mouseEvent.target.getBoundingClientRect!();
+      // FIXME mouseEvent 以外が渡されることがある
+      const rect = mouseEvent.target?.getBoundingClientRect!() || { left: 0, top: 0 }; // FIXME
       const x = zoom.unZoomX(mouseEvent.clientX - rect.left);
       const y = zoom.unZoomY(mouseEvent.clientY - rect.top);
       const found = layout.find(x, y, radius);
