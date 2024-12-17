@@ -21,6 +21,7 @@ def extraction(config):
     prompt = config["extraction"]["prompt"]
     workers = config["extraction"]["workers"]
     limit = config["extraction"]["limit"]
+    property_columns = config["extraction"]["properties"]
 
     comment_ids = (comments["comment-id"].values)[:limit]
     comments.set_index("comment-id", inplace=True)
@@ -40,6 +41,10 @@ def extraction(config):
                         "arg-id": f"A{comment_id}_{j}",
                         "comment-id": int(comment_id),
                         "argument": arg,
+                        **{
+                            prop: comments.loc[comment_id][prop]
+                            for prop in property_columns
+                        },
                     }
                     results = pd.concat(
                         [results, pd.DataFrame([new_row])], ignore_index=True
