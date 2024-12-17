@@ -374,7 +374,7 @@ function DesktopMap(props: MapProps) {
                     cx={zoom.zoomX(scaleX(x) + 20)}
                     cy={zoom.zoomY(scaleY(y))}
                     fill={color(cluster.cluster_id, onlyCluster)}
-                    opacity={isHighlighted ? 1 : 0.1}
+                    opacity={isHighlighted ? 0.85 : 0.03}
                     // opacity={expanded && tooltip?.arg_id !== arg_id ? 0.3 : 1}
                     r={tooltip?.arg_id === arg_id ? 8 : 4}
                   />
@@ -414,12 +414,13 @@ function DesktopMap(props: MapProps) {
                       )
                     ),
                     color: color(cluster.cluster_id, onlyCluster),
-                    opacity:
-                      expanded
-                        ? 0.3
-                        : tooltip?.cluster_id === cluster.cluster_id
-                        ? 0
-                        : 0.85,
+                    // opacity:
+                    //   expanded
+                    //     ? 0.3
+                    //     : tooltip?.cluster_id === cluster.cluster_id
+                    //     ? 0
+                    //     : 0.85,
+                    opacity: highlightText != '' ? 0.3 : 0.85,
                   }}
                 >
                   {t(cluster.cluster)}
