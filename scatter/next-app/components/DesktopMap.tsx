@@ -176,18 +176,27 @@ function DesktopMap(props: MapProps) {
     }
   };
 
+  let animationFrameId: number | null = null
+
   const handleMove = (e: any) => {
-    if (!expanded) {
-      const movedPoint = findPoint(e);
-      if (movedPoint) {
-        const newPosition = calculateTooltipPosition(e.clientX, e.clientY);
-        setTooltip(movedPoint.data);
-        setTooltipPosition(newPosition);
-      } else {
-        setTooltip(null);
-      }
+    if (expanded) return
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId)
     }
-  };
+    animationFrameId = requestAnimationFrame(() => {
+      const movedPoint = findPoint(e)
+      if (movedPoint) {
+        // 既に表示されている tooltip と選択された tooltip が同じ場合はスキップ
+        if (tooltip?.arg_id !== movedPoint.data.arg_id) {
+          setTooltip(movedPoint.data)
+          setTooltipPosition(calculateTooltipPosition(e.clientX, e.clientY))
+        }
+      } else {
+        setTooltip(null)
+      }
+      animationFrameId = null
+    })
+  }
 
   const toggleFavorite = (fav: FavoritePoint) => {
     setFavorites((prevFavorites) => {
@@ -251,7 +260,7 @@ function DesktopMap(props: MapProps) {
         threshold: 5,
       },
       pinch: {
-        scaleBounds: { min: 0.5, max: 4 }, 
+        scaleBounds: { min: 0.5, max: 4 },
       },
     }
   );
@@ -261,12 +270,12 @@ function DesktopMap(props: MapProps) {
     if (match) {
       const firstMatch = match[1];
       let secondMatch = '';
-  
+
       if (match[2]) {
         const innerMatch = match[2].match(/（([^）]+)）/);
         secondMatch = innerMatch ? `（${innerMatch[1]}）` : `（${match[2]}）`;
       }
-  
+
       return `＜${firstMatch}に関する分析結果${secondMatch}＞`;
     }
     return null;
@@ -275,7 +284,7 @@ function DesktopMap(props: MapProps) {
 
   useEffect(() => {
     if (clusters.length === 0) return;
-  
+
     // 全てのデータ点のXとYの最小値と最大値を計算
     const allX = clusters.flatMap(cluster => cluster.arguments.map(arg => arg.x));
     const allY = clusters.flatMap(cluster => cluster.arguments.map(arg => arg.y));
@@ -283,20 +292,20 @@ function DesktopMap(props: MapProps) {
     const maxX = Math.max(...allX);
     const minY = Math.min(...allY);
     const maxY = Math.max(...allY);
-  
+
     const dataWidth = maxX - minX;
     const dataHeight = maxY - minY;
-  
+
     if (!dimensions) return;
-  
+
     const { width: dimensionsWidth, height: containerHeight } = dimensions;
     const containerWidth = fullScreen ? dimensionsWidth * 0.75 : dimensionsWidth;
-  
+
     const margin = fullScreen ? 0.6 : 0.8;
     const scaleX = (containerWidth * margin) / dataWidth;
     const scaleY = (containerHeight * margin) / dataHeight;
     let scale = Math.min(scaleX, scaleY);
-  
+
     // フルスクリーン時のスケールを調整
     if (fullScreen) {
       scale *= 0.8;
@@ -332,12 +341,12 @@ function DesktopMap(props: MapProps) {
         >
           {/* 地図タイトル */}
           {showTitle && fullScreen && (
-            <div 
+            <div
               className="absolute top-12 left-1/2 transform -translate-x-1/2 z-10 bg-white px-4 py-2 rounded-lg shadow-md"
               style={{
                 opacity: expanded ? 0.3 : 0.85,
                 whiteSpace: 'nowrap',
-                overflow: 'hidden', 
+                overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}
             >
@@ -472,7 +481,7 @@ function DesktopMap(props: MapProps) {
               </button>
               <button
                 className="m-2 underline"
-                onClick={() => setShowFavorites(x => !x)} 
+                onClick={() => setShowFavorites(x => !x)}
               >
                 {showFavorites ? t('お気に入りを非表示') : t('お気に入りを表示')}
               </button>
