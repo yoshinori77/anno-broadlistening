@@ -77,13 +77,9 @@ function DesktopMap(props: MapProps) {
   const [showTitle, setShowTitle] = useState(false);
   const [minVotes, setMinVotes] = useState(0);
   const [minConsensus, setMinConsensus] = useState(50);
-  const voteFilter = useFilter(
-    clusters,
-    comments,
-    minVotes,
-    minConsensus,
-    dataHasVotes
-  );
+  const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes);
+
+  const [highlightText, setHighlightText] = useState<string>('');
 
   const totalArgs = clusters
   .map((c) => c.arguments.length)
@@ -368,9 +364,9 @@ function DesktopMap(props: MapProps) {
           >
             {/* DOT CIRCLES */}
             {clusters.map((cluster) =>
-              cluster.arguments
-                .filter(voteFilter.filter)
-                .map(({ arg_id, x, y }) => (
+              cluster.arguments.filter(voteFilter.filter).map(({ arg_id, x, y, argument }) => {
+                const isHighlighted = highlightText ? argument.includes(highlightText) : false;
+                return (
                   <circle
                     className="pointer-events-none"
                     key={arg_id}
@@ -378,12 +374,12 @@ function DesktopMap(props: MapProps) {
                     cx={zoom.zoomX(scaleX(x) + 20)}
                     cy={zoom.zoomY(scaleY(y))}
                     fill={color(cluster.cluster_id, onlyCluster)}
-                    opacity={
-                      expanded && tooltip?.arg_id !== arg_id ? 0.3 : 1
-                    }
+                    opacity={isHighlighted ? 1 : 0.1}
+                    // opacity={expanded && tooltip?.arg_id !== arg_id ? 0.3 : 1}
                     r={tooltip?.arg_id === arg_id ? 8 : 4}
                   />
-                ))
+                );
+              })
             )}
             {/* お気に入りの表示 */}
             {showFavorites && (
@@ -505,6 +501,13 @@ function DesktopMap(props: MapProps) {
                   {t('Reset zoom')}
                 </button>
               )}
+              <input
+                type="text"
+                placeholder="文字列を入力して強調表示"
+                value={highlightText}
+                onChange={(e) => setHighlightText(e.target.value)}
+                className="w-64 p-2 border rounded"
+              />
               {dataHasVotes && (
                 <button
                   className="m-2 underline"
