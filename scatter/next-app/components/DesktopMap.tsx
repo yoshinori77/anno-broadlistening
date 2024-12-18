@@ -56,13 +56,16 @@ function DesktopMap(props: MapProps) {
   const dimensions = useAutoResize(props.width, props.height);
   const clusters = useRelativePositions(props.clusters);
   const zoom = useZoom(dimensions, fullScreen);
+  const [highlightText, setHighlightText] = useState<string>('');
   const findPoint = useVoronoiFinder(
     clusters,
     props.comments,
     color,
     zoom,
     dimensions,
-    onlyCluster
+    onlyCluster,
+    undefined,
+    highlightText
   );
   const [tooltip, setTooltip] = useState<Point | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({
@@ -77,14 +80,7 @@ function DesktopMap(props: MapProps) {
   const [showTitle, setShowTitle] = useState(false);
   const [minVotes, setMinVotes] = useState(0);
   const [minConsensus, setMinConsensus] = useState(50);
-  const voteFilter = useFilter(
-    clusters,
-    comments,
-    minVotes,
-    minConsensus,
-    dataHasVotes
-  );
-
+  const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes);
   const totalArgs = clusters
   .map((c) => c.arguments.length)
   .reduce((a, b) => a + b, 0);
@@ -368,22 +364,50 @@ function DesktopMap(props: MapProps) {
           >
             {/* DOT CIRCLES */}
             {clusters.map((cluster) =>
-              cluster.arguments
-                .filter(voteFilter.filter)
-                .map(({ arg_id, x, y }) => (
+              cluster.arguments.filter(voteFilter.filter).map(({ arg_id, x, y, argument }) => {
+                const isHighlightMode = highlightText !== "";
+                const isHighlighted = isHighlightMode && argument.includes(highlightText);
+                const isCurrentTooltip = (tooltip?.arg_id === arg_id);
+
+                let calculatedOpacity;
+                const DEFAULT_OPACITY = 1;
+                const LIGHT_OPACITY = 0.03;
+                if (expanded){
+                  if(isCurrentTooltip){
+                    calculatedOpacity = DEFAULT_OPACITY;
+                  }else{
+                    calculatedOpacity = LIGHT_OPACITY;
+                  }
+                } else if (isHighlightMode) {
+                  if(isHighlighted){
+                    calculatedOpacity = DEFAULT_OPACITY;
+                  }else{
+                    calculatedOpacity = LIGHT_OPACITY;
+                  }
+                } else {
+                  calculatedOpacity = DEFAULT_OPACITY;
+                }
+
+                let calculatedRadius;
+                if (expanded && isCurrentTooltip){
+                  calculatedRadius = 8;
+                } else {
+                  calculatedRadius = 4;
+                }
+
+                return (
                   <circle
-                    className="pointer-events-none"
-                    key={arg_id}
-                    id={arg_id}
-                    cx={zoom.zoomX(scaleX(x) + 20)}
-                    cy={zoom.zoomY(scaleY(y))}
-                    fill={color(cluster.cluster_id, onlyCluster)}
-                    opacity={
-                      expanded && tooltip?.arg_id !== arg_id ? 0.3 : 1
-                    }
-                    r={tooltip?.arg_id === arg_id ? 8 : 4}
-                  />
-                ))
+                  className="pointer-events-none"
+                  key={arg_id}
+                  id={arg_id}
+                  cx={zoom.zoomX(scaleX(x) + 20)}
+                  cy={zoom.zoomY(scaleY(y))}
+                  fill={color(cluster.cluster_id, onlyCluster)}
+                  opacity={calculatedOpacity}
+                  r={calculatedRadius}
+                />
+                );
+              })
             )}
             {/* お気に入りの表示 */}
             {showFavorites && (
@@ -401,7 +425,30 @@ function DesktopMap(props: MapProps) {
           {/* CLUSTER LABELS */}
           {fullScreen && showLabels && !zoom.dragging && (
             <div>
-              {clusters.map((cluster) => (
+              {clusters.map((cluster) => {
+
+                const isHighlightMode = highlightText !== "";
+
+                let calculatedOpacity;
+                const DEFAULT_OPACITY = 0.85;
+                const LIGHT_OPACITY = 0.3;
+                const HIDDEN = 0;
+                
+                if (isHighlightMode) {
+                  calculatedOpacity = LIGHT_OPACITY;
+                  // nishio: ハイライトモードではラベルが濃いと点が見づらいため、透明度を下げる
+                  // 将来的にはハイライトされた点を含むクラスタのみラベルを表示するように変更するといいかも
+                } else if (expanded) {
+                  calculatedOpacity = LIGHT_OPACITY;
+                } else if (tooltip?.cluster_id === cluster.cluster_id) {
+                  // tooltipが表示されているクラスタのラベルは非表示
+                  // tooltipが表示されているときは、その点がどのクラスタか表示されているため
+                  calculatedOpacity = HIDDEN;
+                } else {
+                  calculatedOpacity = DEFAULT_OPACITY;
+                }
+
+                return (
                 <div
                   className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold text-md`}
                   key={cluster.cluster_id}
@@ -418,12 +465,7 @@ function DesktopMap(props: MapProps) {
                       )
                     ),
                     color: color(cluster.cluster_id, onlyCluster),
-                    opacity:
-                      expanded
-                        ? 0.3
-                        : tooltip?.cluster_id === cluster.cluster_id
-                        ? 0
-                        : 0.85,
+                    opacity: calculatedOpacity,
                   }}
                 >
                   {t(cluster.cluster)}
@@ -433,7 +475,7 @@ function DesktopMap(props: MapProps) {
                     </span>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
           )}
 
@@ -505,6 +547,13 @@ function DesktopMap(props: MapProps) {
                   {t('Reset zoom')}
                 </button>
               )}
+              <input
+                type="text"
+                placeholder="文字列を入力して強調表示"
+                value={highlightText}
+                onChange={(e) => setHighlightText(e.target.value)}
+                className="w-64 p-2 border rounded"
+              />
               {dataHasVotes && (
                 <button
                   className="m-2 underline"
