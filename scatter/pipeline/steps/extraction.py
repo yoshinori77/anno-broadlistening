@@ -12,6 +12,13 @@ from utils import update_progress
 COMMA_AND_SPACE_AND_RIGHT_BRACKET = re.compile(r",\s*(\])")
 
 
+def _validate_property_columns(property_columns: list[str], comments: pd.DataFrame) -> None:
+    if not all(property in comments.columns for property in property_columns):
+        raise ValueError(
+            f"Properties {property_columns} not found in comments. Columns are {comments.columns}"
+        )
+
+
 def extraction(config):
     dataset = config["output_dir"]
     path = f"outputs/{dataset}/args.csv"
@@ -22,7 +29,7 @@ def extraction(config):
     workers = config["extraction"]["workers"]
     limit = config["extraction"]["limit"]
     property_columns = config["extraction"]["properties"]
-
+    _validate_property_columns(property_columns, comments)
     comment_ids = (comments["comment-id"].values)[:limit]
     comments.set_index("comment-id", inplace=True)
     results = pd.DataFrame()

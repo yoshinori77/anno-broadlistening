@@ -193,6 +193,7 @@ aggregation: {
 visualization: {
   replacements?: {replace: string, by: string}[] // list of text replacements to apply to the UI
 }
+}
 ```
 
 ## Generated outputs

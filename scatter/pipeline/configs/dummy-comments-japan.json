@@ -7,7 +7,8 @@
       "workers": 3,
       "limit": 20,
       "properties":[
-        "source"
+        "source",
+        "age"
       ]
     },
     "clustering": {
@@ -17,6 +18,10 @@
       "hidden_properties": {
         "source": [
           "X API"
+        ],
+        "age": [
+          20,
+          25
         ]
       }
     },
