@@ -38,6 +38,8 @@ type MapProps = Result & {
   propertyMap: PropertyMap;
 };
 
+type PropertyFilter = {[key: string]: string};
+
 const truncateText = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
@@ -199,6 +201,38 @@ function ClusterLabels(
   );
 }
 
+function PropertyFilter(propertyMap: PropertyMap, 
+  propertyFilter: PropertyFilter, setPropertyFilter: React.Dispatch<React.SetStateAction<PropertyFilter>>,t : any) {
+  return <>{t("属性フィルタ")}
+  {Object.entries(propertyMap).map(([propKey, propValues]) => {
+    const uniqueValues = Array.from(new Set(Object.values(propValues)));
+    uniqueValues.sort(); // ABC順にソート
+
+    return (
+      <span key={propKey} className="mb-4">
+        <label className="mb-1 font-semibold">{propKey}: </label>
+        <select
+          value={propertyFilter[propKey] ?? ''}
+          onChange={(e) => {
+            // propKeyごとの選択値を状態管理する必要あり
+            setPropertyFilter((prev) => ({
+              ...prev,
+              [propKey]: e.target.value,
+            }));
+          }}
+          className="border p-1 rounded"
+        >
+          <option value=""></option>
+          {uniqueValues.map((val) => (
+            <option key={val} value={val}>
+              {val}
+            </option>
+          ))}
+        </select>
+      </span>
+    );
+  })}</>
+}
 
 function DesktopMap(props: MapProps) {
   const {
@@ -639,42 +673,14 @@ function DesktopMap(props: MapProps) {
               )}
               <input
                 type="text"
-                placeholder="文字列を入力して強調表示"
+                placeholder={t("検索")}
                 value={highlightText}
                 onChange={(e) => setHighlightText(e.target.value)}
-                className="w-64 p-2 border rounded"
+                className="w-20 p-2 border rounded"
               />
 
               {/* PROPERTY FILTER */}
-              {propertyMap &&
-                Object.entries(propertyMap).map(([propKey, propValues]) => {
-                  const uniqueValues = Array.from(new Set(Object.values(propValues)));
-                  uniqueValues.sort(); // ABC順にソート
-
-                  return (
-                    <div key={propKey} className="mb-4">
-                      <label className="block mb-1 font-semibold">{propKey}</label>
-                      <select
-                        value={propertyFilter[propKey] ?? ''}
-                        onChange={(e) => {
-                          // propKeyごとの選択値を状態管理する必要あり
-                          setPropertyFilter((prev) => ({
-                            ...prev,
-                            [propKey]: e.target.value,
-                          }));
-                        }}
-                        className="border p-1 rounded"
-                      >
-                        <option value=""></option>
-                        {uniqueValues.map((val) => (
-                          <option key={val} value={val}>
-                            {val}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  );
-                })}
+              {propertyMap && PropertyFilter(propertyMap, propertyFilter, setPropertyFilter, t)}
 
               {dataHasVotes && (
                 <button
