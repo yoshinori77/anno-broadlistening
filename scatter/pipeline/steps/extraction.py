@@ -37,14 +37,15 @@ def extraction(config):
         for comment_id, extracted_args in zip(batch, batch_results):
             for j, arg in enumerate(extracted_args):
                 if arg not in existing_arguments:
+                    properties = {
+                        prop: comments.loc[comment_id][prop]
+                        for prop in property_columns
+                    }
                     new_row = {
                         "arg-id": f"A{comment_id}_{j}",
                         "comment-id": int(comment_id),
                         "argument": arg,
-                        **{
-                            prop: comments.loc[comment_id][prop]
-                            for prop in property_columns
-                        },
+                        **properties,
                     }
                     results = pd.concat(
                         [results, pd.DataFrame([new_row])], ignore_index=True
