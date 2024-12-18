@@ -1,7 +1,9 @@
-import { MouseEventHandler, useMemo } from "react";
-import { voronoi } from "@visx/voronoi";
-import { Cluster, Argument, Dimensions, CommentsMap, Point } from "@/types";
-import { Zoom } from "./useZoom";
+import { useMemo } from 'react';
+import { voronoi } from '@visx/voronoi';
+import { Cluster, Argument, Dimensions, CommentsMap, Point } from '@/types';
+import { Zoom } from './useZoom';
+
+type FilterFn = (arg: Argument) => boolean;
 
 const useVoronoiFinder = (
   clusters: Cluster[],
@@ -11,27 +13,26 @@ const useVoronoiFinder = (
   dimensions?: Dimensions,
   onlyCluster?: string,
   radius = 30,
-  filterKeyword?: string
+  filterFn?: FilterFn
 ) => {
   return useMemo(() => {
     if (!dimensions) return () => null as any;
     const { width, height, scaleX, scaleY } = dimensions;
 
-    // キーワードでargumentsをフィルタリング
-    const points: Point[] = clusters.flatMap((cluster) =>
-      cluster.arguments
-        .filter(({ arg_id, x, y, argument }) => {
-          // キーワードが存在する場合のみフィルタリングを適用
-          if (filterKeyword == undefined || filterKeyword == '') return true;
-          return argument.includes(filterKeyword); // キーワードが含まれるか
-        })
-        .map((arg) => ({
-          ...arg,
-          ...cluster,
-          ...comments[arg.comment_id],
-          color: color(cluster.cluster_id),
-        }))
+    let points: Point[] = clusters.flatMap((cluster) =>
+      cluster.arguments.map((arg) => ({
+        ...arg,
+        ...cluster,
+        ...comments[arg.comment_id],
+        color: color(cluster.cluster_id),
+      }))
     );
+
+    // filterFnがあればpointをフィルタ
+    if (filterFn) {
+      points = points.filter(filterFn);
+    }
+
     const layout = voronoi<Point>({
       x: (d) => scaleX(d.x),
       y: (d) => scaleY(d.y),
@@ -48,7 +49,7 @@ const useVoronoiFinder = (
         return null;
       return found;
     };
-  }, [clusters, dimensions]);
+  }, [clusters, dimensions, filterFn]);
 };
 
 export default useVoronoiFinder;

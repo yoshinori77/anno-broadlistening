@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Result, Point, FavoritePoint, Cluster, PropertyMap } from '@/types';
+import { Result, Point, FavoritePoint, Cluster, PropertyMap, Argument } from '@/types';
 import Tooltip from '@/components/DesktopTooltip';
 import useAutoResize from '@/hooks/useAutoResize';
 import useRelativePositions from '@/hooks/useRelativePositions';
@@ -48,7 +48,6 @@ const truncateText = (text: string, maxLength: number) => {
 function DotCircles(
   clusters: Cluster[],
   expanded: boolean,
-  highlightText: string,
   tooltip: Point | null,
   zoom: any,
   scaleX: any,
@@ -56,29 +55,14 @@ function DotCircles(
   color: any,
   onlyCluster: string | undefined,
   voteFilter: any,
-  propertyFilter: { [key: string]: string },
-  propertyMap: PropertyMap
+  filterFn: (arg: Argument) => boolean
 ) {
-  const isPropertyHighlightMode = Object.values(propertyFilter).some((val) => val !== '');
-  const isTextHighlightMode = highlightText !== '';
-
+  
   return clusters.map((cluster) =>
-    cluster.arguments.filter(voteFilter.filter).map(({ arg_id, x, y, argument }) => {
-      const isTextHighlighted = isTextHighlightMode && argument.includes(highlightText);
+    cluster.arguments.filter(voteFilter.filter).map((arg) => {
+      const { arg_id, x, y, argument } = arg;
       const isCurrentTooltip = tooltip?.arg_id === arg_id;
-
-      let isPropertyHighlighted = true;
-      if (isPropertyHighlightMode) {
-        for (const [propKey, val] of Object.entries(propertyFilter)) {
-          if (val === '') continue;
-          const argVal = propertyMap[propKey]?.[arg_id];
-          if (argVal !== val) {
-            isPropertyHighlighted = false;
-            break;
-          }
-        }
-      }
-
+  
       let calculatedOpacity;
       const DEFAULT_OPACITY = 1;
       const LIGHT_OPACITY = 0.3;
@@ -88,27 +72,10 @@ function DotCircles(
         } else {
           calculatedOpacity = LIGHT_OPACITY;
         }
-      } else if (isTextHighlightMode && isPropertyHighlightMode) {
-        if (isTextHighlighted && isPropertyHighlighted) {
-          calculatedOpacity = DEFAULT_OPACITY;
-        } else {
-          calculatedOpacity = LIGHT_OPACITY;
-        }
-      } else if (isTextHighlightMode) {
-        if (isTextHighlighted) {
-          calculatedOpacity = DEFAULT_OPACITY;
-        } else {
-          calculatedOpacity = LIGHT_OPACITY;
-        }
-      } else if (isPropertyHighlightMode) {
-        // プロパティのみ
-        if (isPropertyHighlighted) {
-          calculatedOpacity = DEFAULT_OPACITY;
-        } else {
-          calculatedOpacity = LIGHT_OPACITY;
-        }
-      } else {
+      } else if (filterFn(arg)) {
         calculatedOpacity = DEFAULT_OPACITY;
+      } else {
+        calculatedOpacity = LIGHT_OPACITY;
       }
 
       let calculatedRadius;
@@ -249,7 +216,39 @@ function DesktopMap(props: MapProps) {
   const dimensions = useAutoResize(props.width, props.height);
   const clusters = useRelativePositions(props.clusters);
   const zoom = useZoom(dimensions, fullScreen);
+
+  // for vote filter
+  const [minVotes, setMinVotes] = useState(0);
+  const [minConsensus, setMinConsensus] = useState(50);
+  const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes);
+
+  // text and property filter
   const [highlightText, setHighlightText] = useState<string>('');
+  const [propertyFilter, setPropertyFilter] = useState({} as {[key: string]: string});
+
+  const isPropertyHighlightMode = Object.values(propertyFilter).some((val) => val !== '');
+  const isTextHighlightMode = highlightText !== '';
+
+  const filterFn = (arg: Argument) => {
+    // return true if the point should be displayed
+    if (!voteFilter.filter(arg)) return false;
+
+    if (isTextHighlightMode && !arg.argument.includes(highlightText)) {
+      return false;
+    }
+
+    if (isPropertyHighlightMode) {
+      for (const [propKey, val] of Object.entries(propertyFilter)) {
+        if (val === '') continue;
+        const argVal = propertyMap[propKey]?.[arg.arg_id];
+        if (argVal !== val) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
   const findPoint = useVoronoiFinder(
     clusters,
     props.comments,
@@ -258,7 +257,7 @@ function DesktopMap(props: MapProps) {
     dimensions,
     onlyCluster,
     undefined,
-    highlightText
+    filterFn
   );
   const [tooltip, setTooltip] = useState<Point | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({
@@ -271,10 +270,6 @@ function DesktopMap(props: MapProps) {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
-  const [minVotes, setMinVotes] = useState(0);
-  const [minConsensus, setMinConsensus] = useState(50);
-  const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes);
-  const [propertyFilter, setPropertyFilter] = useState({} as {[key: string]: string});
 
   const totalArgs = clusters
   .map((c) => c.arguments.length)
@@ -561,7 +556,6 @@ function DesktopMap(props: MapProps) {
             {DotCircles(
               clusters,
               expanded,
-              highlightText,
               tooltip,
               zoom,
               scaleX,
@@ -569,8 +563,7 @@ function DesktopMap(props: MapProps) {
               color,
               onlyCluster,
               voteFilter,
-              propertyFilter,
-              propertyMap
+              filterFn
             )}
             {/* お気に入りの表示 */}
             {showFavorites && (
