@@ -370,20 +370,22 @@ function DesktopMap(props: MapProps) {
                 const isCurrentTooltip = (tooltip?.arg_id === arg_id);
 
                 let calculatedOpacity;
+                const DEFAULT_OPACITY = 1;
+                const LIGHT_OPACITY = 0.03;
                 if (expanded){
                   if(isCurrentTooltip){
-                    calculatedOpacity = 1;
+                    calculatedOpacity = DEFAULT_OPACITY;
                   }else{
-                    calculatedOpacity = 0.03;
+                    calculatedOpacity = LIGHT_OPACITY;
                   }
                 } else if (isHighlightMode) {
                   if(isHighlighted){
-                    calculatedOpacity = 1;
+                    calculatedOpacity = DEFAULT_OPACITY;
                   }else{
-                    calculatedOpacity = 0.03;
+                    calculatedOpacity = LIGHT_OPACITY;
                   }
                 } else {
-                  calculatedOpacity = 1;
+                  calculatedOpacity = DEFAULT_OPACITY;
                 }
 
                 let calculatedRadius;
@@ -428,18 +430,22 @@ function DesktopMap(props: MapProps) {
                 const isHighlightMode = highlightText !== "";
 
                 let calculatedOpacity;
+                const DEFAULT_OPACITY = 0.85;
+                const LIGHT_OPACITY = 0.3;
+                const HIDDEN = 0;
+                
                 if (isHighlightMode) {
-                  calculatedOpacity = 0.3;
+                  calculatedOpacity = LIGHT_OPACITY;
                   // nishio: ハイライトモードではラベルが濃いと点が見づらいため、透明度を下げる
                   // 将来的にはハイライトされた点を含むクラスタのみラベルを表示するように変更するといいかも
                 } else if (expanded) {
-                  calculatedOpacity = 0.3;
+                  calculatedOpacity = LIGHT_OPACITY;
                 } else if (tooltip?.cluster_id === cluster.cluster_id) {
                   // tooltipが表示されているクラスタのラベルは非表示
                   // tooltipが表示されているときは、その点がどのクラスタか表示されているため
-                  calculatedOpacity = 0;
+                  calculatedOpacity = HIDDEN;
                 } else {
-                  calculatedOpacity = 0.85;
+                  calculatedOpacity = DEFAULT_OPACITY;
                 }
 
                 return (
