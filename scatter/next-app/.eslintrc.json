@@ -8,6 +8,7 @@
     "semi": ["error", "never"],
     "no-extra-semi": "error",
     "eol-last": ["error", "always"],
+    "@next/next/no-img-element": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -16,9 +17,7 @@
         "caughtErrorsIgnorePattern": "^_"
       }
     ],
-    "@next/next/no-img-element": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-require-imports": "off",
     "react-hooks/exhaustive-deps": "off",
     "react-hooks/rules-of-hooks": "off",
     "prefer-const": "off"

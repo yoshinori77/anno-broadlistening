@@ -6,13 +6,13 @@ const outputs = '../pipeline/outputs'
 
 export async function getStaticProps({}: any) {
   const report = process.env.REPORT
+  const fs = await import('fs')
   if (report && report.length) {
-    const fs = require('fs')
     const result = fs.readFileSync(`../pipeline/outputs/${report}/result.json`, 'utf8')
     return {props: {result: JSON.parse(result)}}
   }
-  const fs = require('fs')
-  const subfolders = fs.readdirSync(outputs, {withFileTypes: true})
+  const subfolders = fs
+    .readdirSync(outputs, {withFileTypes: true})
     .map((x: any) => x.name)
     .filter((x: string) => !x.startsWith('.'))
   return {props: {subfolders}}

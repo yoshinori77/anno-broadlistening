@@ -7,7 +7,7 @@ export async function getStaticPaths() {
   if (report && report.length) {
     return {paths: [], fallback: false}
   }
-  const fs = require('fs')
+  const fs = await import('fs')
   const subfolders = fs.readdirSync(outputs, {withFileTypes: true})
     .map((x: any) => x.name)
     .filter((x: string) => !x.startsWith('.'))
@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({params}: any) {
-  const fs = require('fs')
+  const fs = await import('fs')
   const result = fs.readFileSync(`../pipeline/outputs/${params.name}/result.json`, 'utf8')
   return {props: {name: params.name, result: JSON.parse(result)}}
 }
