@@ -159,6 +159,7 @@ extraction?: {
   prompt?: string // full content the prompt for extraction step
   limit?: number // maximal number of rows to process (default to 1000)
   workers?: number // maximal number of parallel workers (default to 1)
+  properties?: string[] // list of properties to extract from the input file (default to []). extracted properties will be added to the output file.
 },
 clustering: {
   clusters?: number // number of clusters to generate (default to 8)
@@ -184,9 +185,14 @@ translation: {
 },
 aggregation: {
   sampling_num?: number // number of arguments to sample for the report (default to 5000)
+  hidden_parameters: {
+    properties?: { [key: string]: string[] } // object specifying properties to hide in the UI
+                                             // Keys represent categories (e.g., "source"), and values are arrays of specific attributes to hide.
+  }
 },
 visualization: {
   replacements?: {replace: string, by: string}[] // list of text replacements to apply to the UI
+}
 }
 ```
 
