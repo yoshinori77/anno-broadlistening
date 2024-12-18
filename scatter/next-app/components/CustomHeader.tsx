@@ -1,7 +1,14 @@
 import Head from 'next/head'
 
-const CustomHeader = (props: any) => {
-  const {config} = props
+type CustomHeaderProps = {
+  config: {
+    name: string
+    description?: string
+    question?: string
+  }
+}
+
+const CustomHeader = ({config}: CustomHeaderProps) => {
   const title = config.name
   const description = config.description || config.question
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID

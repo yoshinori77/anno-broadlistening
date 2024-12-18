@@ -4,7 +4,7 @@ import {Result} from '../types'
 
 const outputs = '../pipeline/outputs'
 
-export async function getStaticProps({}: any) {
+export async function getStaticProps({}) {
   const report = process.env.REPORT
   const fs = await import('fs')
   if (report && report.length) {
@@ -13,7 +13,7 @@ export async function getStaticProps({}: any) {
   }
   const subfolders = fs
     .readdirSync(outputs, {withFileTypes: true})
-    .map((x: any) => x.name)
+    .map((x) => x.name)
     .filter((x: string) => !x.startsWith('.'))
   return {props: {subfolders}}
 }

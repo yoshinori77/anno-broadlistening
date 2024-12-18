@@ -6,9 +6,10 @@
   "rules": {
     "quotes": ["error", "single"],
     "semi": ["error", "never"],
-    "no-extra-semi": "error",
+    "no-extra-semi": ["error"],
     "eol-last": ["error", "always"],
-    "@next/next/no-img-element": "off",
+    "@next/next/no-img-element": ["off"],
+    "@typescript-eslint/no-explicit-any": ["warn"],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -16,7 +17,6 @@
         "varsIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_"
       }
-    ],
-    "@typescript-eslint/no-explicit-any": "off"
+    ]
   }
 }

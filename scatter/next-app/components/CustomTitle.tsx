@@ -1,7 +1,12 @@
 import Head from 'next/head'
 
-const CustomTitle = (props: any) => {
-  const {config} = props
+type CustomTitleProps = {
+  config: {
+    name: string
+  }
+}
+
+const CustomTitle = ({config}: CustomTitleProps) => {
   const title = config.name
 
   return (

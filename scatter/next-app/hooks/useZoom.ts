@@ -36,7 +36,7 @@ const useZoom = (dimensions?: Dimensions, allowZoom?: boolean) => {
   }
 
   const onMouseMove =
-    (onMove: any, onDrag: any): any =>
+    (onMove: any, onDrag: any) =>
       (e: any) => {
         onMove(e)
         if (!allowZoom || disabled) return
@@ -53,7 +53,7 @@ const useZoom = (dimensions?: Dimensions, allowZoom?: boolean) => {
       }
 
   const onMouseUp =
-    (onClick: any): any =>
+    (onClick: any) =>
       (e: any) => {
         if (!moved) {
           onClick(e)
@@ -61,7 +61,7 @@ const useZoom = (dimensions?: Dimensions, allowZoom?: boolean) => {
         setDragging(false)
       }
 
-  const events = ({onMove, onDrag, onClick}: any): any => {
+  const events = ({onMove, onDrag, onClick}: any) => {
     return {
       onWheel,
       onMouseDown: onMouseDown,
