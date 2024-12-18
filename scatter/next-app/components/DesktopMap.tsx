@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Result, Point, FavoritePoint } from '@/types';
+import { Result, Point, FavoritePoint, Cluster } from '@/types';
 import Tooltip from '@/components/DesktopTooltip';
 import useAutoResize from '@/hooks/useAutoResize';
 import useRelativePositions from '@/hooks/useRelativePositions';
@@ -41,6 +41,134 @@ const truncateText = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
 };
+
+function DotCircles(
+  clusters: Cluster[],
+  expanded: boolean,
+  highlightText: string,
+  tooltip: Point | null,
+  zoom: any,
+  scaleX: any,
+  scaleY: any,
+  color: any,
+  onlyCluster?: string,
+  voteFilter?: any
+) {
+  clusters.map((cluster) =>
+    cluster.arguments.filter(voteFilter.filter).map(({ arg_id, x, y, argument }) => {
+      const isHighlightMode = highlightText !== '';
+      const isHighlighted = isHighlightMode && argument.includes(highlightText);
+      const isCurrentTooltip = tooltip?.arg_id === arg_id;
+
+      let calculatedOpacity;
+      const DEFAULT_OPACITY = 1;
+      const LIGHT_OPACITY = 0.03;
+      if (expanded) {
+        if (isCurrentTooltip) {
+          calculatedOpacity = DEFAULT_OPACITY;
+        } else {
+          calculatedOpacity = LIGHT_OPACITY;
+        }
+      } else if (isHighlightMode) {
+        if (isHighlighted) {
+          calculatedOpacity = DEFAULT_OPACITY;
+        } else {
+          calculatedOpacity = LIGHT_OPACITY;
+        }
+      } else {
+        calculatedOpacity = DEFAULT_OPACITY;
+      }
+
+      let calculatedRadius;
+      if (expanded && isCurrentTooltip) {
+        calculatedRadius = 8;
+      } else {
+        calculatedRadius = 4;
+      }
+
+      return (
+        <circle
+          className="pointer-events-none"
+          key={arg_id}
+          id={arg_id}
+          cx={zoom.zoomX(scaleX(x) + 20)}
+          cy={zoom.zoomY(scaleY(y))}
+          fill={color(cluster.cluster_id, onlyCluster)}
+          opacity={calculatedOpacity}
+          r={calculatedRadius}
+        />
+      );
+    })
+  );
+}
+
+function ClusterLabels(
+  clusters: Cluster[],
+  fullscreen: boolean,
+  expanded: boolean,
+  highlightText: string,
+  tooltip: Point | null,
+  zoom: any,
+  scaleX: any,
+  scaleY: any,
+  color: any,
+  t: any,
+  onlyCluster: string | undefined,
+  showLabels: boolean,
+  showRatio: boolean,
+  totalArgs: number,
+) {
+  if (!fullscreen || !showLabels || zoom.dragging) {
+    return null;
+  }
+
+  return (
+    <div>
+      {clusters.map((cluster) => {
+        const isHighlightMode = highlightText !== '';
+
+        let calculatedOpacity;
+        const DEFAULT_OPACITY = 0.85;
+        const LIGHT_OPACITY = 0.3;
+        const HIDDEN = 0;
+
+        if (isHighlightMode) {
+          calculatedOpacity = LIGHT_OPACITY;
+          // nishio: ハイライトモードではラベルが濃いと点が見づらいため、透明度を下げる
+          // 将来的にはハイライトされた点を含むクラスタのみラベルを表示するように変更するといいかも
+        } else if (expanded) {
+          calculatedOpacity = LIGHT_OPACITY;
+        } else if (tooltip?.cluster_id === cluster.cluster_id) {
+          // tooltipが表示されているクラスタのラベルは非表示
+          // tooltipが表示されているときは、その点がどのクラスタか表示されているため
+          calculatedOpacity = HIDDEN;
+        } else {
+          calculatedOpacity = DEFAULT_OPACITY;
+        }
+
+        return (
+          <div
+            className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold text-md`}
+            key={cluster.cluster_id}
+            style={{
+              transform: 'translate(-50%, -50%)',
+              left: zoom.zoomX(scaleX(mean(cluster.arguments.map(({ x }) => x)))),
+              top: zoom.zoomY(scaleY(mean(cluster.arguments.map(({ y }) => y)))),
+              color: color(cluster.cluster_id, onlyCluster),
+              opacity: calculatedOpacity,
+            }}
+          >
+            {t(cluster.cluster)}
+            {showRatio && (
+              <span>({Math.round((100 * cluster.arguments.length) / totalArgs)}%)</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 
 function DesktopMap(props: MapProps) {
   const {
@@ -363,51 +491,17 @@ function DesktopMap(props: MapProps) {
             })}
           >
             {/* DOT CIRCLES */}
-            {clusters.map((cluster) =>
-              cluster.arguments.filter(voteFilter.filter).map(({ arg_id, x, y, argument }) => {
-                const isHighlightMode = highlightText !== "";
-                const isHighlighted = isHighlightMode && argument.includes(highlightText);
-                const isCurrentTooltip = (tooltip?.arg_id === arg_id);
-
-                let calculatedOpacity;
-                const DEFAULT_OPACITY = 1;
-                const LIGHT_OPACITY = 0.03;
-                if (expanded){
-                  if(isCurrentTooltip){
-                    calculatedOpacity = DEFAULT_OPACITY;
-                  }else{
-                    calculatedOpacity = LIGHT_OPACITY;
-                  }
-                } else if (isHighlightMode) {
-                  if(isHighlighted){
-                    calculatedOpacity = DEFAULT_OPACITY;
-                  }else{
-                    calculatedOpacity = LIGHT_OPACITY;
-                  }
-                } else {
-                  calculatedOpacity = DEFAULT_OPACITY;
-                }
-
-                let calculatedRadius;
-                if (expanded && isCurrentTooltip){
-                  calculatedRadius = 8;
-                } else {
-                  calculatedRadius = 4;
-                }
-
-                return (
-                  <circle
-                  className="pointer-events-none"
-                  key={arg_id}
-                  id={arg_id}
-                  cx={zoom.zoomX(scaleX(x) + 20)}
-                  cy={zoom.zoomY(scaleY(y))}
-                  fill={color(cluster.cluster_id, onlyCluster)}
-                  opacity={calculatedOpacity}
-                  r={calculatedRadius}
-                />
-                );
-              })
+            {DotCircles(
+              clusters,
+              expanded,
+              highlightText,
+              tooltip,
+              zoom,
+              scaleX,
+              scaleY,
+              color,
+              onlyCluster,
+              voteFilter
             )}
             {/* お気に入りの表示 */}
             {showFavorites && (
@@ -423,60 +517,21 @@ function DesktopMap(props: MapProps) {
             )}
           </svg>
           {/* CLUSTER LABELS */}
-          {fullScreen && showLabels && !zoom.dragging && (
-            <div>
-              {clusters.map((cluster) => {
-
-                const isHighlightMode = highlightText !== "";
-
-                let calculatedOpacity;
-                const DEFAULT_OPACITY = 0.85;
-                const LIGHT_OPACITY = 0.3;
-                const HIDDEN = 0;
-                
-                if (isHighlightMode) {
-                  calculatedOpacity = LIGHT_OPACITY;
-                  // nishio: ハイライトモードではラベルが濃いと点が見づらいため、透明度を下げる
-                  // 将来的にはハイライトされた点を含むクラスタのみラベルを表示するように変更するといいかも
-                } else if (expanded) {
-                  calculatedOpacity = LIGHT_OPACITY;
-                } else if (tooltip?.cluster_id === cluster.cluster_id) {
-                  // tooltipが表示されているクラスタのラベルは非表示
-                  // tooltipが表示されているときは、その点がどのクラスタか表示されているため
-                  calculatedOpacity = HIDDEN;
-                } else {
-                  calculatedOpacity = DEFAULT_OPACITY;
-                }
-
-                return (
-                <div
-                  className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold text-md`}
-                  key={cluster.cluster_id}
-                  style={{
-                    transform: 'translate(-50%, -50%)',
-                    left: zoom.zoomX(
-                      scaleX(
-                        mean(cluster.arguments.map(({ x }) => x))
-                      )
-                    ),
-                    top: zoom.zoomY(
-                      scaleY(
-                        mean(cluster.arguments.map(({ y }) => y))
-                      )
-                    ),
-                    color: color(cluster.cluster_id, onlyCluster),
-                    opacity: calculatedOpacity,
-                  }}
-                >
-                  {t(cluster.cluster)}
-                  {showRatio && (
-                    <span>
-                      ({Math.round((100 * cluster.arguments.length) / totalArgs)}%)
-                    </span>
-                  )}
-                </div>
-              )})}
-            </div>
+          {ClusterLabels(
+            clusters,
+            fullScreen,
+            expanded,
+            highlightText,
+            tooltip,
+            zoom,
+            scaleX,
+            scaleY,
+            color,
+            t,
+            onlyCluster,
+            showLabels,
+            showRatio,
+            totalArgs
           )}
 
           {/* TOOLTIP */}
