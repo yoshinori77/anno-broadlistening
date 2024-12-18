@@ -365,19 +365,45 @@ function DesktopMap(props: MapProps) {
             {/* DOT CIRCLES */}
             {clusters.map((cluster) =>
               cluster.arguments.filter(voteFilter.filter).map(({ arg_id, x, y, argument }) => {
-                const isHighlighted = highlightText ? argument.includes(highlightText) : false;
+                const isHighlightMode = highlightText !== "";
+                const isHighlighted = isHighlightMode && argument.includes(highlightText);
+                const isCurrentTooltip = (tooltip?.arg_id === arg_id);
+
+                let calculatedOpacity;
+                if (expanded){
+                  if(isCurrentTooltip){
+                    calculatedOpacity = 1;
+                  }else{
+                    calculatedOpacity = 0.03;
+                  }
+                } else if (isHighlightMode) {
+                  if(isHighlighted){
+                    calculatedOpacity = 1;
+                  }else{
+                    calculatedOpacity = 0.03;
+                  }
+                } else {
+                  calculatedOpacity = 1;
+                }
+
+                let calculatedRadius;
+                if (expanded && isCurrentTooltip){
+                  calculatedRadius = 8;
+                } else {
+                  calculatedRadius = 4;
+                }
+
                 return (
                   <circle
-                    className="pointer-events-none"
-                    key={arg_id}
-                    id={arg_id}
-                    cx={zoom.zoomX(scaleX(x) + 20)}
-                    cy={zoom.zoomY(scaleY(y))}
-                    fill={color(cluster.cluster_id, onlyCluster)}
-                    opacity={isHighlighted ? 0.85 : 0.03}
-                    // opacity={expanded && tooltip?.arg_id !== arg_id ? 0.3 : 1}
-                    r={tooltip?.arg_id === arg_id ? 8 : 4}
-                  />
+                  className="pointer-events-none"
+                  key={arg_id}
+                  id={arg_id}
+                  cx={zoom.zoomX(scaleX(x) + 20)}
+                  cy={zoom.zoomY(scaleY(y))}
+                  fill={color(cluster.cluster_id, onlyCluster)}
+                  opacity={calculatedOpacity}
+                  r={calculatedRadius}
+                />
                 );
               })
             )}
@@ -397,7 +423,26 @@ function DesktopMap(props: MapProps) {
           {/* CLUSTER LABELS */}
           {fullScreen && showLabels && !zoom.dragging && (
             <div>
-              {clusters.map((cluster) => (
+              {clusters.map((cluster) => {
+
+                const isHighlightMode = highlightText !== "";
+
+                let calculatedOpacity;
+                if (isHighlightMode) {
+                  calculatedOpacity = 0.3;
+                  // nishio: ハイライトモードではラベルが濃いと点が見づらいため、透明度を下げる
+                  // 将来的にはハイライトされた点を含むクラスタのみラベルを表示するように変更するといいかも
+                } else if (expanded) {
+                  calculatedOpacity = 0.3;
+                } else if (tooltip?.cluster_id === cluster.cluster_id) {
+                  // tooltipが表示されているクラスタのラベルは非表示
+                  // tooltipが表示されているときは、その点がどのクラスタか表示されているため
+                  calculatedOpacity = 0;
+                } else {
+                  calculatedOpacity = 0.85;
+                }
+
+                return (
                 <div
                   className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold text-md`}
                   key={cluster.cluster_id}
@@ -414,13 +459,7 @@ function DesktopMap(props: MapProps) {
                       )
                     ),
                     color: color(cluster.cluster_id, onlyCluster),
-                    // opacity:
-                    //   expanded
-                    //     ? 0.3
-                    //     : tooltip?.cluster_id === cluster.cluster_id
-                    //     ? 0
-                    //     : 0.85,
-                    opacity: highlightText != '' ? 0.3 : 0.85,
+                    opacity: calculatedOpacity,
                   }}
                 >
                   {t(cluster.cluster)}
@@ -430,7 +469,7 @@ function DesktopMap(props: MapProps) {
                     </span>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
           )}
 
