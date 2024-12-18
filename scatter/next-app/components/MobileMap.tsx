@@ -64,7 +64,8 @@ function MobileMap(props: MapProps) {
     )
   }
 
-  const [zoomState, setZoomState] = useState({scale: 1, x: 0, y: 0})
+  // TODO _zoomState は参照されていないので setZoomState が不要な可能性がある
+  const [_zoomState, setZoomState] = useState({scale: 1, x: 0, y: 0})
 
   const bind = useGesture({
     onDrag: ({offset: [x, y], memo}) => {

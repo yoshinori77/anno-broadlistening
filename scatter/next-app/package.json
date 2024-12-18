@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "upgrade": "npx npm-check-updates  --interactive"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.6.0",

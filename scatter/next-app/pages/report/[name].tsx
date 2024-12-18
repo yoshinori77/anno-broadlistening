@@ -20,6 +20,6 @@ export async function getStaticProps({params}: any) {
   return {props: {name: params.name, result: JSON.parse(result)}}
 }
 
-export default function Page({name, result}: { name: string, result: Result }) {
+export default function Page({result}: { name: string, result: Result }) {
   return <Report {...result} />
 }

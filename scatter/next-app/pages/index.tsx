@@ -4,7 +4,7 @@ import {Result} from '../types'
 
 const outputs = '../pipeline/outputs'
 
-export async function getStaticProps({params}: any) {
+export async function getStaticProps({}: any) {
   const report = process.env.REPORT
   if (report && report.length) {
     const fs = require('fs')

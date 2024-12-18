@@ -7,8 +7,7 @@ type HeaderProps = Result & {
 }
 
 const Header = (props: HeaderProps) => {
-  const {config} = props
-  const {t, languages, langIndex, setLangIndex} = props.translator
+  const {languages, langIndex, setLangIndex} = props.translator
   const {hasTranslations} = useInferredFeatures(props)
 
   return <div className="fixed top-0 w-full h-7 bg-gradient-to-r from-blue-900 to-white z-10 leading-7">

@@ -152,7 +152,7 @@ function DesktopMap(props: MapProps) {
   }
 
   const [zoomState, setZoomState] = useState({scale: 1, x: 0, y: 0})
-  const [isZoomEnabled, setIsZoomEnabled] = useState(true)
+  const [isZoomEnabled] = useState(true)
 
   const handleClick = (e: any) => {
     if (tooltip && !expanded) {
@@ -231,7 +231,7 @@ function DesktopMap(props: MapProps) {
 
   const bind = useGesture(
     {
-      onDrag: ({movement: [mx, my], cancel, direction: [dx, dy], distance, memo}) => {
+      onDrag: ({movement: [mx, my], cancel, direction: [dx, dy], memo}) => {
         if (!isZoomEnabled) return memo
         if (Math.abs(dy) > Math.abs(dx)) {
           cancel() // ドラッグをキャンセルしてスクロールを許可
