@@ -1,0 +1,24 @@
+{
+    "name": "日本の未来について",
+    "question": "日本の未来に対してどんな意見が寄せられているのか？",
+    "input": "dummy-comments-japan",
+    "model": "gpt-4o-mini",
+    "extraction": {
+      "workers": 3,
+      "limit": 20,
+      "properties":[
+        "source"
+      ]
+    },
+    "clustering": {
+      "clusters": 3
+    },
+    "aggregation": {
+      "hidden_properties": {
+        "source": [
+          "X API"
+        ]
+      }
+    },
+    "intro": "このAI生成レポートは、LLMによって生成されたダミーデータに対して分析を行っています。"
+  }

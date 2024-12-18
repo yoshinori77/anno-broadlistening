@@ -76,16 +76,6 @@ def aggregation(config):
         id = row['comment-id']
         if id in useful_comment_ids:
             res = {'comment': row['comment-body']}
-            # numeric_cols = ['agrees', 'disagrees']
-            # string_cols = ['video', 'interview', 'timestamp']
-            # for col in numeric_cols:
-            #     if col in row:
-            #         res[col] = float(row[col])
-            # for col in string_cols:
-            #     if col in row:
-            #         res[col] = row[col]
-
-            # hidden propertiesに含まれるcommentはresultsに含めない
             should_skip = any(row[prop] in hidden_values for prop, hidden_values in hidden_properties_map.items())
             if should_skip:
                 continue
