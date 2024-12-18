@@ -203,14 +203,14 @@ function ClusterLabels(
 
 function PropertyFilter(propertyMap: PropertyMap, 
   propertyFilter: PropertyFilter, setPropertyFilter: React.Dispatch<React.SetStateAction<PropertyFilter>>,t : any) {
-  return <>{t("属性フィルタ")}
+  return <><span className="m-2">{t("属性フィルタ")}</span>
   {Object.entries(propertyMap).map(([propKey, propValues]) => {
     const uniqueValues = Array.from(new Set(Object.values(propValues)));
     uniqueValues.sort(); // ABC順にソート
 
     return (
       <span key={propKey} className="mb-4">
-        <label className="mb-1 font-semibold">{propKey}: </label>
+        <label className="m-2 font-semibold">{propKey}: </label>
         <select
           value={propertyFilter[propKey] ?? ''}
           onChange={(e) => {
@@ -222,7 +222,7 @@ function PropertyFilter(propertyMap: PropertyMap,
           }}
           className="border p-1 rounded"
         >
-          <option value=""></option>
+          <option value="">{t("(すべて)")}</option>
           {uniqueValues.map((val) => (
             <option key={val} value={val}>
               {val}
@@ -676,7 +676,7 @@ function DesktopMap(props: MapProps) {
                 placeholder={t("検索")}
                 value={highlightText}
                 onChange={(e) => setHighlightText(e.target.value)}
-                className="w-20 p-2 border rounded"
+                className="w-20 m-2 p-2 border rounded"
               />
 
               {/* PROPERTY FILTER */}
