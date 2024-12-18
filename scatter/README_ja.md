@@ -135,6 +135,7 @@ open http://localhost:8080/pipeline/outputs/my-project/report/
     prompt?: string // 抽出ステップのためのプロンプトの全内容
     limit?: number // 処理する行の最大数（デフォルトは1000）
     workers?: number // 並行ワーカーの最大数（デフォルトは1）
+    properties?: string[] // 抽出するプロパティのリスト（デフォルトは[]）。抽出されたプロパティは出力ファイルに追加されます。
   },
   clustering: {
     clusters?: number // 生成するクラスターの数（デフォルトは8）
@@ -160,6 +161,10 @@ open http://localhost:8080/pipeline/outputs/my-project/report/
   },
   aggregation: {
     sampling_num?: number // レポート上で可視化する件数（デフォルトは5000）
+    hidden_parameters: {
+      properties?: { [key: string]: string[] }  // プロパティのカテゴリごとに隠すプロパティのリスト
+                                                // 例: { "source": ["X API"] }
+    }
   },
   visualization: {
     replacements?: {replace: string, by: string}[] // UIに適用するテキスト置換のリスト

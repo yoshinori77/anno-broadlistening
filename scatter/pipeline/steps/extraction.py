@@ -12,6 +12,13 @@ from utils import update_progress
 COMMA_AND_SPACE_AND_RIGHT_BRACKET = re.compile(r",\s*(\])")
 
 
+def _validate_property_columns(property_columns: list[str], comments: pd.DataFrame) -> None:
+    if not all(property in comments.columns for property in property_columns):
+        raise ValueError(
+            f"Properties {property_columns} not found in comments. Columns are {comments.columns}"
+        )
+
+
 def extraction(config):
     dataset = config["output_dir"]
     path = f"outputs/{dataset}/args.csv"
@@ -21,7 +28,8 @@ def extraction(config):
     prompt = config["extraction"]["prompt"]
     workers = config["extraction"]["workers"]
     limit = config["extraction"]["limit"]
-
+    property_columns = config["extraction"]["properties"]
+    _validate_property_columns(property_columns, comments)
     comment_ids = (comments["comment-id"].values)[:limit]
     comments.set_index("comment-id", inplace=True)
     results = pd.DataFrame()
@@ -36,10 +44,15 @@ def extraction(config):
         for comment_id, extracted_args in zip(batch, batch_results):
             for j, arg in enumerate(extracted_args):
                 if arg not in existing_arguments:
+                    properties = {
+                        prop: comments.loc[comment_id][prop]
+                        for prop in property_columns
+                    }
                     new_row = {
                         "arg-id": f"A{comment_id}_{j}",
                         "comment-id": int(comment_id),
                         "argument": arg,
+                        **properties,
                     }
                     results = pd.concat(
                         [results, pd.DataFrame([new_row])], ignore_index=True

@@ -8,7 +8,8 @@
     },
     "options": {
       "limit": 1000,
-      "workers": 1
+      "workers": 1,
+      "properties": []
     },
     "use_llm": true
   },
@@ -95,7 +96,8 @@
     "options": {
       "include_minor": true,
       "sampling_num": 5000,
-      "title_in_map": null
+      "title_in_map": null,
+      "hidden_properties": {}
     }
   },
   {
