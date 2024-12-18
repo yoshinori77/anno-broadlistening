@@ -14,8 +14,8 @@ const VideoLink = ({video, timestamp, interview, showThumbnail, showVideo}: Vide
   }
   const parts = video!.split('/')
   const videoId = parts[parts.length - 1]
-  let [hours, minutes, seconds] = timestamp!.split(':').map(Number)
-  let totalSeconds = hours * 3600 + minutes * 60 + seconds
+  const [hours, minutes, seconds] = timestamp!.split(':').map(Number)
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds
   return <div className="my-4">
     {(showThumbnail || showVideo) && <div className="text-sm font-semibold mb-1">Source video:</div>}
     {showThumbnail &&

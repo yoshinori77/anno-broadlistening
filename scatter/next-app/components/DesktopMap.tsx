@@ -119,7 +119,7 @@ function DesktopMap(props: MapProps) {
     if (containerRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect()
       let x = clientX - containerRect.left
-      let y = clientY - containerRect.top
+      const y = clientY - containerRect.top
 
       // コンテナの幅を取得
       const containerWidth = containerRect.width
