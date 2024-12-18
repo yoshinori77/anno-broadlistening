@@ -5,7 +5,7 @@ import {ColorFunc} from '@/hooks/useClusterColor'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
 import {faBookmark as regularBookmark} from '@fortawesome/free-regular-svg-icons'
-
+import { IconProp } from '@fortawesome/fontawesome-svg-core'
 
 type TooltipProps = {
   point: Point
@@ -100,7 +100,7 @@ function Tooltip(props: TooltipProps) {
             }
             style={{marginLeft: '8px'}}
           >
-            <FontAwesomeIcon icon={isFavorite ? solidBookmark : regularBookmark}/>
+            <FontAwesomeIcon icon={isFavorite ? solidBookmark as IconProp : regularBookmark as IconProp}/>
           </button>
         </div>
         <p className="text-sm sm:text-sm md:text-md mt-2">{point.argument}</p>

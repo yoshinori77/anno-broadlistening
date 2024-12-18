@@ -8,15 +8,15 @@
     "start": "next start",
     "lint": "next lint",
     "test": "echo \"No tests yet\" && exit 0",
-    "upgrade": "npx npm-check-updates  --interactive"
+    "upgrade": "npx npm-check-updates --interactive"
   },
   "dependencies": {
-    "@fortawesome/free-regular-svg-icons": "^6.6.0",
-    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@use-gesture/react": "^10.3.1",
-    "@visx/voronoi": "^3.3.0",
-    "@visx/zoom": "^3.3.0",
+    "@visx/voronoi": "^3.12.0",
+    "@visx/zoom": "^3.12.0",
     "diff": "^5.1.0",
     "next": "^14.2.15",
     "opencc-js": "^1.0.5",
@@ -28,10 +28,10 @@
   "devDependencies": {
     "@types/diff": "^5.0.6",
     "@types/node": "^20",
-    "@types/opencc-js": "^1.0.1",
+    "@types/opencc-js": "^1.0.3",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/showdown": "^2.0.2",
+    "@types/showdown": "^2.0.6",
     "autoprefixer": "^10",
     "eslint": "8.57.1",
     "eslint-config-next": "15.1.1",

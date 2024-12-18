@@ -13,6 +13,7 @@ import {ColorFunc} from '@/hooks/useClusterColor'
 import {useGesture} from '@use-gesture/react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
+import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import CustomTitle from '@/components/CustomTitle'
 
 type TooltipPosition = {
@@ -663,7 +664,7 @@ function DesktopMap(props: MapProps) {
                           onClick={() => toggleFavorite(fav)}
                           className="text-amber-500 text-lg focus:outline-none ml-2"
                         >
-                          <FontAwesomeIcon icon={solidBookmark}/>
+                          <FontAwesomeIcon icon={solidBookmark as IconProp}/>
                         </button>
                       </div>
 
