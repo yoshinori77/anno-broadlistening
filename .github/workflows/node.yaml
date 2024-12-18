@@ -29,10 +29,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: 'scatter/next-app/package-lock.json'
 
     - name: Install dependencies
       working-directory: ./scatter/next-app
-      run: npm install
+      run: npm ci
         
     - name: Run build
       working-directory: scatter/next-app
