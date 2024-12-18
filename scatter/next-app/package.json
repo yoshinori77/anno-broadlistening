@@ -6,7 +6,8 @@
     "dev": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
