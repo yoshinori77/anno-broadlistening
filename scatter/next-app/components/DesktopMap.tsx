@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Result, Point, FavoritePoint, Cluster } from '@/types';
+import { Result, Point, FavoritePoint, Cluster, PropertyMap } from '@/types';
 import Tooltip from '@/components/DesktopTooltip';
 import useAutoResize from '@/hooks/useAutoResize';
 import useRelativePositions from '@/hooks/useRelativePositions';
@@ -35,6 +35,7 @@ type MapProps = Result & {
     description?: string;
     question?: string;
   };
+  propertyMap: PropertyMap;
 };
 
 const truncateText = (text: string, maxLength: number) => {
@@ -51,26 +52,55 @@ function DotCircles(
   scaleX: any,
   scaleY: any,
   color: any,
-  onlyCluster?: string,
-  voteFilter?: any
+  onlyCluster: string | undefined,
+  voteFilter: any,
+  propertyFilter: { [key: string]: string },
+  propertyMap: PropertyMap
 ) {
-  clusters.map((cluster) =>
+  const isPropertyHighlightMode = Object.values(propertyFilter).some((val) => val !== '');
+  const isTextHighlightMode = highlightText !== '';
+
+  return clusters.map((cluster) =>
     cluster.arguments.filter(voteFilter.filter).map(({ arg_id, x, y, argument }) => {
-      const isHighlightMode = highlightText !== '';
-      const isHighlighted = isHighlightMode && argument.includes(highlightText);
+      const isTextHighlighted = isTextHighlightMode && argument.includes(highlightText);
       const isCurrentTooltip = tooltip?.arg_id === arg_id;
+
+      let isPropertyHighlighted = true;
+      if (isPropertyHighlightMode) {
+        for (const [propKey, val] of Object.entries(propertyFilter)) {
+          if (val === '') continue;
+          const argVal = propertyMap[propKey]?.[arg_id];
+          if (argVal !== val) {
+            isPropertyHighlighted = false;
+            break;
+          }
+        }
+      }
 
       let calculatedOpacity;
       const DEFAULT_OPACITY = 1;
-      const LIGHT_OPACITY = 0.03;
+      const LIGHT_OPACITY = 0.3;
       if (expanded) {
         if (isCurrentTooltip) {
           calculatedOpacity = DEFAULT_OPACITY;
         } else {
           calculatedOpacity = LIGHT_OPACITY;
         }
-      } else if (isHighlightMode) {
-        if (isHighlighted) {
+      } else if (isTextHighlightMode && isPropertyHighlightMode) {
+        if (isTextHighlighted && isPropertyHighlighted) {
+          calculatedOpacity = DEFAULT_OPACITY;
+        } else {
+          calculatedOpacity = LIGHT_OPACITY;
+        }
+      } else if (isTextHighlightMode) {
+        if (isTextHighlighted) {
+          calculatedOpacity = DEFAULT_OPACITY;
+        } else {
+          calculatedOpacity = LIGHT_OPACITY;
+        }
+      } else if (isPropertyHighlightMode) {
+        // プロパティのみ
+        if (isPropertyHighlighted) {
           calculatedOpacity = DEFAULT_OPACITY;
         } else {
           calculatedOpacity = LIGHT_OPACITY;
@@ -179,6 +209,7 @@ function DesktopMap(props: MapProps) {
     translator,
     color,
     config,
+    propertyMap
   } = props;
   const { dataHasVotes } = useInferredFeatures(props);
   const dimensions = useAutoResize(props.width, props.height);
@@ -209,6 +240,8 @@ function DesktopMap(props: MapProps) {
   const [minVotes, setMinVotes] = useState(0);
   const [minConsensus, setMinConsensus] = useState(50);
   const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes);
+  const [propertyFilter, setPropertyFilter] = useState({} as {[key: string]: string});
+
   const totalArgs = clusters
   .map((c) => c.arguments.length)
   .reduce((a, b) => a + b, 0);
@@ -501,7 +534,9 @@ function DesktopMap(props: MapProps) {
               scaleY,
               color,
               onlyCluster,
-              voteFilter
+              voteFilter,
+              propertyFilter,
+              propertyMap
             )}
             {/* お気に入りの表示 */}
             {showFavorites && (
@@ -609,6 +644,38 @@ function DesktopMap(props: MapProps) {
                 onChange={(e) => setHighlightText(e.target.value)}
                 className="w-64 p-2 border rounded"
               />
+
+              {/* PROPERTY FILTER */}
+              {propertyMap &&
+                Object.entries(propertyMap).map(([propKey, propValues]) => {
+                  const uniqueValues = Array.from(new Set(Object.values(propValues)));
+                  uniqueValues.sort(); // ABC順にソート
+
+                  return (
+                    <div key={propKey} className="mb-4">
+                      <label className="block mb-1 font-semibold">{propKey}</label>
+                      <select
+                        value={propertyFilter[propKey] ?? ''}
+                        onChange={(e) => {
+                          // propKeyごとの選択値を状態管理する必要あり
+                          setPropertyFilter((prev) => ({
+                            ...prev,
+                            [propKey]: e.target.value,
+                          }));
+                        }}
+                        className="border p-1 rounded"
+                      >
+                        <option value=""></option>
+                        {uniqueValues.map((val) => (
+                          <option key={val} value={val}>
+                            {val}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                })}
+
               {dataHasVotes && (
                 <button
                   className="m-2 underline"
