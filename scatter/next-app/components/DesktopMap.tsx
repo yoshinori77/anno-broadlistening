@@ -67,6 +67,7 @@ function DesktopMap(props: MapProps) {
     undefined,
     highlightText
   )
+
   const [tooltip, setTooltip] = useState<Point | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({
     x: 0,
@@ -80,6 +81,9 @@ function DesktopMap(props: MapProps) {
   const [showTitle, setShowTitle] = useState(false)
   const [minVotes, setMinVotes] = useState(0)
   const [minConsensus, setMinConsensus] = useState(50)
+  const [zoomState, setZoomState] = useState({scale: 1, x: 0, y: 0})
+  const [isZoomEnabled] = useState(true)
+
   const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes)
   const totalArgs = clusters
     .map((c) => c.arguments.length)
@@ -101,6 +105,38 @@ function DesktopMap(props: MapProps) {
     }
   })
 
+  const bind = useGesture(
+    {
+      onDrag: ({movement: [mx, my], cancel, direction: [dx, dy], memo}) => {
+        if (!isZoomEnabled) return memo
+        if (Math.abs(dy) > Math.abs(dx)) {
+          cancel() // ドラッグをキャンセルしてスクロールを許可
+          return memo
+        }
+        // 水平方向のドラッグの場合、地図のパンを処理
+        setZoomState((prev) => ({...prev, x: prev.x + mx, y: prev.y + my}))
+        return memo
+      },
+      onPinch: ({offset: [d], memo}) => {
+        const newScale = Math.min(Math.max(d, 0.5), 4)
+        setZoomState((prev) => ({...prev, scale: newScale}))
+        return memo
+      },
+      onClick: ({event}) => {
+        handleTap(event)
+      },
+    },
+    {
+      drag: {
+        filterTaps: true,
+        threshold: 5,
+      },
+      pinch: {
+        scaleBounds: {min: 0.5, max: 4},
+      },
+    }
+  )
+
   useEffect(() => {
     try {
       localStorage.setItem(favoritesKey, JSON.stringify(favorites))
@@ -111,6 +147,44 @@ function DesktopMap(props: MapProps) {
   }, [favorites])
 
   const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (clusters.length === 0) return
+
+    // 全てのデータ点のXとYの最小値と最大値を計算
+    const allX = clusters.flatMap(cluster => cluster.arguments.map(arg => arg.x))
+    const allY = clusters.flatMap(cluster => cluster.arguments.map(arg => arg.y))
+    const minX = Math.min(...allX)
+    const maxX = Math.max(...allX)
+    const minY = Math.min(...allY)
+    const maxY = Math.max(...allY)
+
+    const dataWidth = maxX - minX
+    const dataHeight = maxY - minY
+
+    if (!dimensions) return
+
+    const {width: dimensionsWidth, height: containerHeight} = dimensions
+    const containerWidth = fullScreen ? dimensionsWidth * 0.75 : dimensionsWidth
+
+    const margin = fullScreen ? 0.6 : 0.8
+    const scaleX = (containerWidth * margin) / dataWidth
+    const scaleY = (containerHeight * margin) / dataHeight
+    let scale = Math.min(scaleX, scaleY)
+
+    // フルスクリーン時のスケールを調整
+    if (fullScreen) {
+      scale *= 0.8
+    }
+    const x = (containerWidth - (dataWidth * scale)) / 2 - (minX * scale)
+    const y = (containerHeight - (dataHeight * scale)) / 2 - (minY * scale)
+
+    // zoomState が変更される場合のみ setZoomState を呼び出す
+    if (zoomState.scale !== scale || zoomState.x !== x || zoomState.y !== y) {
+      setZoomState({scale, x, y})
+    }
+
+  }, [clusters, dimensions, fullScreen])
 
   const TOOLTIP_WIDTH = 200
 
@@ -150,9 +224,6 @@ function DesktopMap(props: MapProps) {
       />
     )
   }
-
-  const [zoomState, setZoomState] = useState({scale: 1, x: 0, y: 0})
-  const [isZoomEnabled] = useState(true)
 
   const handleClick = (e: any) => {
     if (tooltip && !expanded) {
@@ -229,38 +300,6 @@ function DesktopMap(props: MapProps) {
     }
   }
 
-  const bind = useGesture(
-    {
-      onDrag: ({movement: [mx, my], cancel, direction: [dx, dy], memo}) => {
-        if (!isZoomEnabled) return memo
-        if (Math.abs(dy) > Math.abs(dx)) {
-          cancel() // ドラッグをキャンセルしてスクロールを許可
-          return memo
-        }
-        // 水平方向のドラッグの場合、地図のパンを処理
-        setZoomState((prev) => ({...prev, x: prev.x + mx, y: prev.y + my}))
-        return memo
-      },
-      onPinch: ({offset: [d], memo}) => {
-        const newScale = Math.min(Math.max(d, 0.5), 4)
-        setZoomState((prev) => ({...prev, scale: newScale}))
-        return memo
-      },
-      onClick: ({event}) => {
-        handleTap(event)
-      },
-    },
-    {
-      drag: {
-        filterTaps: true,
-        threshold: 5,
-      },
-      pinch: {
-        scaleBounds: {min: 0.5, max: 4},
-      },
-    }
-  )
-
   function extractFirstBracketContent(name: string): string | null {
     const match = name.match(/＜([^＞]+)＞(?:.*?＜([^＞]+)＞)?/)
     if (match) {
@@ -276,45 +315,6 @@ function DesktopMap(props: MapProps) {
     }
     return null
   }
-
-
-  useEffect(() => {
-    if (clusters.length === 0) return
-
-    // 全てのデータ点のXとYの最小値と最大値を計算
-    const allX = clusters.flatMap(cluster => cluster.arguments.map(arg => arg.x))
-    const allY = clusters.flatMap(cluster => cluster.arguments.map(arg => arg.y))
-    const minX = Math.min(...allX)
-    const maxX = Math.max(...allX)
-    const minY = Math.min(...allY)
-    const maxY = Math.max(...allY)
-
-    const dataWidth = maxX - minX
-    const dataHeight = maxY - minY
-
-    if (!dimensions) return
-
-    const {width: dimensionsWidth, height: containerHeight} = dimensions
-    const containerWidth = fullScreen ? dimensionsWidth * 0.75 : dimensionsWidth
-
-    const margin = fullScreen ? 0.6 : 0.8
-    const scaleX = (containerWidth * margin) / dataWidth
-    const scaleY = (containerHeight * margin) / dataHeight
-    let scale = Math.min(scaleX, scaleY)
-
-    // フルスクリーン時のスケールを調整
-    if (fullScreen) {
-      scale *= 0.8
-    }
-    const x = (containerWidth - (dataWidth * scale)) / 2 - (minX * scale)
-    const y = (containerHeight - (dataHeight * scale)) / 2 - (minY * scale)
-
-    // zoomState が変更される場合のみ setZoomState を呼び出す
-    if (zoomState.scale !== scale || zoomState.x !== x || zoomState.y !== y) {
-      setZoomState({scale, x, y})
-    }
-
-  }, [clusters, dimensions, fullScreen])
 
   const map_title = extractFirstBracketContent(config.name)
 

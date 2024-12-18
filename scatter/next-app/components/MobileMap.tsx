@@ -54,16 +54,6 @@ function MobileMap(props: MapProps) {
     setIsTouch(isTouchDevice())
   }, [])
 
-  if (!dimensions) {
-    console.log('NO DIMENSIONS???')
-    return (
-      <div
-        className="m-auto bg-blue-50"
-        style={{width: props.width, height: props.height}}
-      />
-    )
-  }
-
   // TODO _zoomState は参照されていないので setZoomState が不要な可能性がある
   const [_zoomState, setZoomState] = useState({scale: 1, x: 0, y: 0})
 
@@ -77,6 +67,16 @@ function MobileMap(props: MapProps) {
       return memo
     },
   })
+
+  if (!dimensions) {
+    console.log('NO DIMENSIONS???')
+    return (
+      <div
+        className="m-auto bg-blue-50"
+        style={{width: props.width, height: props.height}}
+      />
+    )
+  }
 
   return (
     <>
