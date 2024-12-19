@@ -1,4 +1,5 @@
 """Generate a convenient JSON output file."""
+
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -36,7 +37,9 @@ def create_custom_intro(config, total_sampled_num: int):
             args_count=args_count, total_sampled_num=total_sampled_num
         )
         custom_intro += extra_intro
-    custom_intro += "一部、AIによる分析結果の中で、事実と異なる内容については削除を行った。"
+    custom_intro += (
+        "一部、AIによる分析結果の中で、事実と異なる内容については削除を行った。"
+    )
     with open(result_path, "r") as f:
         result = json.load(f)
     result["config"]["intro"] = custom_intro
@@ -44,11 +47,14 @@ def create_custom_intro(config, total_sampled_num: int):
         json.dump(result, f, indent=2)
 
 
-def _build_property_map(arguments: pd.DataFrame, property_columns: list[str]) -> dict[str, dict[str, str]]:
+def _build_property_map(
+    arguments: pd.DataFrame, property_columns: list[str]
+) -> dict[str, dict[str, str]]:
     property_map = defaultdict(dict)
     for prop in property_columns:
         for arg_id, row in arguments.iterrows():
-            property_map[prop][arg_id] = row[prop]
+            # LLMによるclassificationがうまく行かず、NaNの場合はNoneにする
+            property_map[prop][arg_id] = row[prop] if not pd.isna(row[prop]) else None
     return property_map
 
 
@@ -69,17 +75,22 @@ def aggregation(config):
     arguments = pd.read_csv(f"outputs/{config['output_dir']}/args.csv")
     arguments.set_index("arg-id", inplace=True)
     comments = pd.read_csv(f"inputs/{config['input']}.csv")
-    hidden_properties_map: dict[str, list[str]] = config["aggregation"]["hidden_properties"]
+    hidden_properties_map: dict[str, list[str]] = config["aggregation"][
+        "hidden_properties"
+    ]
 
-    useful_comment_ids = set(arguments['comment-id'].values)
+    useful_comment_ids = set(arguments["comment-id"].values)
     for _, row in comments.iterrows():
-        id = row['comment-id']
+        id = row["comment-id"]
         if id in useful_comment_ids:
-            res = {'comment': row['comment-body']}
-            should_skip = any(row[prop] in hidden_values for prop, hidden_values in hidden_properties_map.items())
+            res = {"comment": row["comment-body"]}
+            should_skip = any(
+                row[prop] in hidden_values
+                for prop, hidden_values in hidden_properties_map.items()
+            )
             if should_skip:
                 continue
-            results['comments'][str(id)] = res
+            results["comments"][str(id)] = res
 
     languages = list(config.get("translation", {}).get("languages", []))
     if len(languages) > 0:
@@ -187,8 +198,13 @@ def aggregation(config):
             except:
                 print("Error with arg_id:", arg_id)
 
-        property_map = _build_property_map(arguments, hidden_properties_map.keys())
-        results["propertyMap"] = property_map
+    # 属性情報のカラムは、元データに対して指定したカラムとclassificationするカテゴリを合わせたもの
+    property_columns = list(hidden_properties_map.keys()) + list(
+        config["extraction"]["categories"].keys()
+    )
+    property_map = _build_property_map(arguments, property_columns)
+    results["propertyMap"] = property_map
+
     with open(path, "w") as file:
         json.dump(results, file, indent=2)
 

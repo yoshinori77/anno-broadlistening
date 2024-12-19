@@ -6,13 +6,16 @@ import re
 import pandas as pd
 from tqdm import tqdm
 
+from services.category_classification import classify_args
 from services.llm import request_to_chat_openai
 from utils import update_progress
 
 COMMA_AND_SPACE_AND_RIGHT_BRACKET = re.compile(r",\s*(\])")
 
 
-def _validate_property_columns(property_columns: list[str], comments: pd.DataFrame) -> None:
+def _validate_property_columns(
+    property_columns: list[str], comments: pd.DataFrame
+) -> None:
     if not all(property in comments.columns for property in property_columns):
         raise ValueError(
             f"Properties {property_columns} not found in comments. Columns are {comments.columns}"
@@ -59,6 +62,10 @@ def extraction(config):
                     )
                     existing_arguments.add(arg)
         update_progress(config, incr=len(batch))
+
+    classification_categories = config["extraction"]["categories"]
+    if classification_categories:
+        results = classify_args(results, config, workers)
     results.to_csv(path, index=False)
 
 
@@ -72,7 +79,9 @@ def extract_batch(batch, prompt, model, workers):
             for i, input in enumerate(batch)
         ]
 
-        done, not_done = concurrent.futures.wait([f for _, f in futures_with_index], timeout=30)
+        done, not_done = concurrent.futures.wait(
+            [f for _, f in futures_with_index], timeout=30
+        )
         results = [[] for _ in range(len(batch))]
 
         for _, future in futures_with_index:
