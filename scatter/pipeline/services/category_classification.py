@@ -96,6 +96,22 @@ def _build_batch_args_string(batch_args: pd.DataFrame) -> str:
     )
 
 
+def _parse_arg_result(classification_results: dict, arg_id: str, categories: list[str]) -> dict:
+    arg_result = classification_results.get(arg_id, {})
+    if not isinstance(arg_result, dict):
+        return {
+            "arg-id": arg_id,
+            **{category: None for category in categories},
+        }
+
+    parsed_result = {"arg-id": arg_id}
+    for category in categories:
+        category_value = arg_result.get(category, None)
+        # カテゴリの値はstrのみを想定（2024/12/19時点）
+        parsed_result[category] = category_value if isinstance(category_value, str) else None
+    return parsed_result
+
+
 def classify_batch_args(batch_args: pd.DataFrame, categories: dict, model: str) -> dict:
     category_string = _build_categories_string(categories)
     batch_args_string = _build_batch_args_string(batch_args)
@@ -115,25 +131,18 @@ def classify_batch_args(batch_args: pd.DataFrame, categories: dict, model: str) 
         return {}
 
 
-def process_batch(batch_args, config):
-    categories = config["extraction"]["categories"]
-    return classify_batch_args(batch_args, categories, config["extraction"]["model"])
-
-
 def classify_args(args: pd.DataFrame, config, workers: int) -> pd.DataFrame:
     batch_size = config["extraction"]["category_batch_size"]
 
     classification_results = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        # Adjust the range to ensure all elements are covered
         batch_start_indices = range(0, len(args), batch_size)
         future_to_batch = {
             executor.submit(
                 classify_batch_args,
                 args.loc[batch_idx : batch_idx + batch_size],
                 config["extraction"]["categories"],
-                "gpt-4o-mini",
-                # config["extraction"]["model"]
+                config["extraction"]["model"],
             ): batch_idx
             for batch_idx in tqdm(batch_start_indices, desc="Classifying arguments")
         }
@@ -145,13 +154,8 @@ def classify_args(args: pd.DataFrame, config, workers: int) -> pd.DataFrame:
     results = []
     categories = list(config["extraction"]["categories"].keys())
     for arg_id in args["arg-id"]:
-        arg_result = classification_results.get(arg_id, {})
-        results.append(
-            {
-                "arg-id": arg_id,
-                **{category: arg_result.get(category) for category in categories},
-            }
-        )
+        arg_result = _parse_arg_result(classification_results, arg_id, categories)
+        results.append(arg_result)
     classification_results_df = pd.DataFrame(results)
     merged = args.merge(classification_results_df, on="arg-id", how="left")
     return merged
