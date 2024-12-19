@@ -62,6 +62,7 @@ function Tooltip(props: TooltipProps) {
       pointerEvents: 'none', // ホバリング時はマウスイベントを無視
     }
 
+
   return (
     <>
       {(expanded) && (
@@ -104,6 +105,12 @@ function Tooltip(props: TooltipProps) {
           </button>
         </div>
         <p className="text-sm sm:text-sm md:text-md mt-2">{point.argument}</p>
+        {expanded && point.comment && (
+          <div className="mt-4 pt-4 border-t">
+            <p className="text-sm sm:text-sm md:text-sm">要約元のコメント</p>
+            <p className="text-xs sm:text-xs md:text-xs">{point.comment}</p>
+          </div>
+        )}
       </div>
     </>
   )
