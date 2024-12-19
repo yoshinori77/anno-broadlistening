@@ -1,8 +1,9 @@
-import showdown from "showdown";
-const converter = new showdown.Converter();
+import showdown from 'showdown'
+
+const converter = new showdown.Converter()
 
 const CustomIntroduction = (props: any) => {
-  const { override, config } = props;
+  const {override, config} = props
 
   if (!override) {
     // 元のコードを使用
@@ -23,11 +24,11 @@ const CustomIntroduction = (props: any) => {
             </p>
           </div>
         </div>
-      );
+      )
     }
-    return null;
+    return null
   }
-  return <div className="max-w-xl m-auto mb-4 text-justify">{override}</div>;
-};
+  return <div className="max-w-xl m-auto mb-4 text-justify">{override}</div>
+}
 
-export default CustomIntroduction;
+export default CustomIntroduction

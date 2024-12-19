@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Result, Point } from '@/types';
-import Tooltip from '@/components/MobileTooltip';
-import useAutoResize from '@/hooks/useAutoResize';
-import useRelativePositions from '@/hooks/useRelativePositions';
-import useVoronoiFinder from '@/hooks/useVoronoiFinder';
-import useInferredFeatures from '@/hooks/useInferredFeatures';
-import useZoom from '@/hooks/useZoom';
-import useFilter from '@/hooks/useFilter';
-import { mean, isTouchDevice } from '@/utils';
-import { Translator } from '@/hooks/useTranslatorAndReplacements';
-import { ColorFunc } from '@/hooks/useClusterColor';
-import { useGesture } from 'react-use-gesture';
-import CustomTitle from '@/components/CustomTitle';
+import React, {useEffect, useState} from 'react'
+import {useGesture} from 'react-use-gesture'
+import CustomTitle from '@/components/CustomTitle'
+import Tooltip from '@/components/MobileTooltip'
+import useAutoResize from '@/hooks/useAutoResize'
+import {ColorFunc} from '@/hooks/useClusterColor'
+import useFilter from '@/hooks/useFilter'
+import useInferredFeatures from '@/hooks/useInferredFeatures'
+import useRelativePositions from '@/hooks/useRelativePositions'
+import {Translator} from '@/hooks/useTranslatorAndReplacements'
+import useVoronoiFinder from '@/hooks/useVoronoiFinder'
+import useZoom from '@/hooks/useZoom'
+import {Point, Result} from '@/types'
+import {isTouchDevice, mean} from '@/utils'
 
 type MapProps = Result & {
   width?: number,
@@ -28,58 +28,59 @@ type MapProps = Result & {
     description?: string,
     question?: string,
   },
-};
+}
 
 function MobileMap(props: MapProps) {
-  const { fullScreen, back, onlyCluster, comments, translator, color, config } = props;
-  const { dataHasVotes } = useInferredFeatures(props);
-  const dimensions = useAutoResize(props.width, props.height);
-  const clusters = useRelativePositions(props.clusters);
-  const zoom = useZoom(dimensions, fullScreen);
-  const findPoint = useVoronoiFinder(clusters, props.comments, color, zoom, dimensions, onlyCluster);
-  const [tooltip, setTooltip] = useState<Point | null>(null);
-  const [expanded, setExpanded] = useState(false);
-  const [showLabels, setShowLabels] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
-  const [minVotes, setMinVotes] = useState(0);
-  const [minConsensus, setMinConsensus] = useState(50);
-  const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes);
+  const {fullScreen, back, onlyCluster, comments, translator, color, config} = props
+  const {dataHasVotes} = useInferredFeatures(props)
+  const dimensions = useAutoResize(props.width, props.height)
+  const clusters = useRelativePositions(props.clusters)
+  const zoom = useZoom(dimensions, fullScreen)
+  const findPoint = useVoronoiFinder(clusters, props.comments, color, zoom, dimensions, onlyCluster)
+  const [tooltip, setTooltip] = useState<Point | null>(null)
+  const [expanded, setExpanded] = useState(false)
+  const [showLabels, setShowLabels] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
+  const [minVotes, setMinVotes] = useState(0)
+  const [minConsensus, setMinConsensus] = useState(50)
+  const voteFilter = useFilter(clusters, comments, minVotes, minConsensus, dataHasVotes)
 
-  const { scaleX, scaleY, width, height } = dimensions || {};
-  const { t } = translator;
+  const {scaleX, scaleY, width, height} = dimensions || {}
+  const {t} = translator
 
-  const [isTouch, setIsTouch] = useState(false);
+  const [isTouch, setIsTouch] = useState(false)
 
   useEffect(() => {
-    setIsTouch(isTouchDevice());
-  }, []);
+    setIsTouch(isTouchDevice())
+  }, [])
+
+  // TODO _zoomState は参照されていないので setZoomState が不要な可能性がある
+  const [_zoomState, setZoomState] = useState({scale: 1, x: 0, y: 0})
+
+  const bind = useGesture({
+    onDrag: ({offset: [x, y], memo}) => {
+      setZoomState((prev) => ({...prev, x, y}))
+      return memo
+    },
+    onPinch: ({offset: [d], memo}) => {
+      setZoomState((prev) => ({...prev, scale: d}))
+      return memo
+    },
+  })
 
   if (!dimensions) {
-    console.log('NO DIMENSIONS???');
+    console.log('NO DIMENSIONS???')
     return (
       <div
         className="m-auto bg-blue-50"
-        style={{ width: props.width, height: props.height }}
+        style={{width: props.width, height: props.height}}
       />
-    );
+    )
   }
-
-  const [zoomState, setZoomState] = useState({ scale: 1, x: 0, y: 0 });
-
-  const bind = useGesture({
-    onDrag: ({ offset: [x, y], memo }) => {
-      setZoomState((prev) => ({ ...prev, x, y }));
-      return memo;
-    },
-    onPinch: ({ offset: [d], memo }) => {
-      setZoomState((prev) => ({ ...prev, scale: d }));
-      return memo;
-    },
-  });
 
   return (
     <>
-      <CustomTitle config={config} />
+      <CustomTitle config={config}/>
 
       <div
         className="m-auto relative"
@@ -90,7 +91,7 @@ function MobileMap(props: MapProps) {
           backgroundColor: '#dcdcdc',
         }}
         onMouseLeave={() => {
-          if (!expanded) setTooltip(null);
+          if (!expanded) setTooltip(null)
         }}
       >
         <svg
@@ -100,21 +101,21 @@ function MobileMap(props: MapProps) {
           {...zoom.events({
             onClick: (e: any) => {
               if (tooltip && !expanded) {
-                setExpanded(true);
-                zoom.disable();
+                setExpanded(true)
+                zoom.disable()
               } else {
-                setExpanded(false);
-                setTooltip(findPoint(e)?.data || null);
-                zoom.enable();
+                setExpanded(false)
+                setTooltip(findPoint(e)?.data || null)
+                zoom.enable()
               }
             },
             onMove: (e: any) => {
               if (!expanded) {
-                setTooltip(findPoint(e)?.data || null);
+                setTooltip(findPoint(e)?.data || null)
               }
             },
             onDrag: () => {
-              setTooltip(null);
+              setTooltip(null)
             },
           })}
         >
@@ -122,7 +123,7 @@ function MobileMap(props: MapProps) {
           {clusters.map((cluster) =>
             cluster.arguments
               .filter(voteFilter.filter)
-              .map(({ arg_id, x, y }) => (
+              .map(({arg_id, x, y}) => (
                 <circle
                   className="pointer-events-none"
                   key={arg_id}
@@ -146,18 +147,18 @@ function MobileMap(props: MapProps) {
             <div>
               {clusters.map((cluster) => (
                 <div
-                className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold ${isTouch ? 'text-base' : 'text-2xl'}`}
+                  className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold ${isTouch ? 'text-base' : 'text-2xl'}`}
                   key={cluster.cluster_id}
                   style={{
                     transform: 'translate(-50%, -50%)',
                     left: zoom.zoomX(
                       scaleX(
-                        mean(cluster.arguments.map(({ x }) => x))
+                        mean(cluster.arguments.map(({x}) => x))
                       )
                     ),
                     top: zoom.zoomY(
                       scaleY(
-                        mean(cluster.arguments.map(({ y }) => y))
+                        mean(cluster.arguments.map(({y}) => y))
                       )
                     ),
                     color: color(cluster.cluster_id, onlyCluster),
@@ -165,8 +166,8 @@ function MobileMap(props: MapProps) {
                       expanded
                         ? 0.3
                         : tooltip?.cluster_id === cluster.cluster_id
-                        ? 0
-                        : 0.85,
+                          ? 0
+                          : 0.85,
                   }}
                 >
                   {t(cluster.cluster)}
@@ -192,7 +193,7 @@ function MobileMap(props: MapProps) {
               {t('Back to report')}
             </button>
             <button
-              className='m-2 underline'
+              className="m-2 underline"
               onClick={() => setShowLabels(x => !x)}>
               {showLabels ? t('Hide labels') : t('Show labels')}
             </button>
@@ -208,7 +209,7 @@ function MobileMap(props: MapProps) {
               <button
                 className="m-2 underline"
                 onClick={() => {
-                  setShowFilters((x) => !x);
+                  setShowFilters((x) => !x)
                 }}
               >
                 {showFilters ? t('Hide filters') : t('Show filters')}
@@ -234,7 +235,7 @@ function MobileMap(props: MapProps) {
                     onInput={(e) => {
                       setMinVotes(
                         parseInt((e.target as HTMLInputElement).value)
-                      );
+                      )
                     }}
                   />
                 </div>
@@ -255,7 +256,7 @@ function MobileMap(props: MapProps) {
                     onInput={(e) => {
                       setMinConsensus(
                         parseInt((e.target as HTMLInputElement).value)
-                      );
+                      )
                     }}
                   />
                 </div>
@@ -269,7 +270,7 @@ function MobileMap(props: MapProps) {
         )}
       </div>
     </>
-  );
+  )
 }
 
-export default MobileMap;
+export default MobileMap

@@ -1,16 +1,23 @@
-import Head from "next/head";
+import Head from 'next/head'
 
-const CustomHeader = (props: any) => {
-  const { config } = props;
-  const title = config.name;
-  const description = config.description || config.question;
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+type CustomHeaderProps = {
+  config: {
+    name: string
+    description?: string
+    question?: string
+  }
+}
+
+const CustomHeader = ({config}: CustomHeaderProps) => {
+  const title = config.name
+  const description = config.description || config.question
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID
 
   return (
     <>
       <Head>
         <title>{title}</title>
-        <meta name="description" content={description} />
+        <meta name="description" content={description}/>
 
         {gtmId && (
           <>
@@ -25,12 +32,12 @@ const CustomHeader = (props: any) => {
                 gtag('js', new Date());
                 gtag('config', '${gtmId}');
               `
-            }} />
+            }}/>
           </>
         )}
       </Head>
     </>
-  );
-};
+  )
+}
 
-export default CustomHeader;
+export default CustomHeader

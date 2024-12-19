@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-const report = process.env.REPORT;
+const report = process.env.REPORT
 
 const nextConfig = !report
   ? {
@@ -12,6 +12,6 @@ const nextConfig = !report
       distDir: `../pipeline/outputs/${report}/report`,
       assetPrefix: "./",
       env: { REPORT: report },
-    };
+    }
 
-module.exports = nextConfig;
+module.exports = nextConfig

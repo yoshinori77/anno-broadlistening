@@ -1,25 +1,25 @@
-import React from 'react';
-import { Point, Dimensions } from '@/types';
-import { Translator } from '@/hooks/useTranslatorAndReplacements';
-import { ColorFunc } from '@/hooks/useClusterColor';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookmark as solidBookmark } from '@fortawesome/free-solid-svg-icons';
-import { faBookmark as regularBookmark } from '@fortawesome/free-regular-svg-icons';
-
+import {IconProp} from '@fortawesome/fontawesome-svg-core'
+import {faBookmark as regularBookmark} from '@fortawesome/free-regular-svg-icons'
+import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import React from 'react'
+import {ColorFunc} from '@/hooks/useClusterColor'
+import {Translator} from '@/hooks/useTranslatorAndReplacements'
+import {Dimensions, Point} from '@/types'
 
 type TooltipProps = {
-  point: Point;
-  dimensions: Dimensions;
-  zoom: any;
-  expanded: boolean;
-  fullScreen: boolean;
-  translator: Translator;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
-  colorFunc: ColorFunc;
-  position: { x: number; y: number };
-  onClose: () => void;
-};
+  point: Point
+  dimensions: Dimensions
+  zoom: any
+  expanded: boolean
+  fullScreen: boolean
+  translator: Translator
+  isFavorite: boolean
+  onToggleFavorite: () => void
+  colorFunc: ColorFunc
+  position: { x: number; y: number }
+  onClose: () => void
+}
 
 function Tooltip(props: TooltipProps) {
   const {
@@ -31,12 +31,12 @@ function Tooltip(props: TooltipProps) {
     onToggleFavorite,
     colorFunc,
     translator,
-  } = props;
+  } = props
 
-  const { t } = translator;
+  const {t} = translator
 
   const tooltipStyle: React.CSSProperties = expanded
-  ? {
+    ? {
       // ツールチップが展開されている場合のスタイル
       position: 'absolute',
       left: '50%',
@@ -48,7 +48,7 @@ function Tooltip(props: TooltipProps) {
       maxWidth: '600px',
       zIndex: 1000,
     }
-  : {
+    : {
       // ホバリング時のツールチップスタイル
       position: 'absolute',
       left: position.x,
@@ -60,7 +60,7 @@ function Tooltip(props: TooltipProps) {
       maxWidth: '300px',
       zIndex: 1000,
       pointerEvents: 'none', // ホバリング時はマウスイベントを無視
-    };
+    }
 
   return (
     <>
@@ -80,13 +80,14 @@ function Tooltip(props: TooltipProps) {
       )}
       <div style={tooltipStyle}>
         {expanded && (
-          <button onClick={onClose} style={{ float: 'right' }}>
+          <button onClick={onClose} style={{float: 'right'}}>
             {t('Close')}
           </button>
         )}
         {/* ツールチップの内容 */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <h3 style={{ color: colorFunc(point.cluster_id), margin: 0 }} className="text-base sm:text-base md:text-base font-bold">
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <h3 style={{color: colorFunc(point.cluster_id), margin: 0}}
+              className="text-base sm:text-base md:text-base font-bold">
             {/* ラベルを大きくする */}
             {translator.t(point.cluster)}
           </h3>
@@ -97,15 +98,15 @@ function Tooltip(props: TooltipProps) {
             aria-label={
               isFavorite ? t('お気に入りから削除') : t('お気に入りに追加')
             }
-            style={{ marginLeft: '8px' }}
+            style={{marginLeft: '8px'}}
           >
-            <FontAwesomeIcon icon={isFavorite ? solidBookmark : regularBookmark} />
+            <FontAwesomeIcon icon={isFavorite ? solidBookmark as IconProp : regularBookmark as IconProp}/>
           </button>
         </div>
         <p className="text-sm sm:text-sm md:text-md mt-2">{point.argument}</p>
       </div>
     </>
-  );
+  )
 }
 
-export default Tooltip;
+export default Tooltip

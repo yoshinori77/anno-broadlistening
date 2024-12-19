@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import { voronoi } from '@visx/voronoi';
-import { Cluster, Argument, Dimensions, CommentsMap, Point } from '@/types';
-import { Zoom } from './useZoom';
+import {voronoi} from '@visx/voronoi'
+import {useMemo} from 'react'
+import {Zoom} from './useZoom'
+import {Argument, Cluster, CommentsMap, Dimensions, Point} from '@/types'
 
-type FilterFn = (arg: Argument) => boolean;
+type FilterFn = (arg: Argument) => boolean
 
 const useVoronoiFinder = (
   clusters: Cluster[],
@@ -16,8 +16,8 @@ const useVoronoiFinder = (
   filterFn?: FilterFn
 ) => {
   return useMemo(() => {
-    if (!dimensions) return () => null as any;
-    const { width, height, scaleX, scaleY } = dimensions;
+    if (!dimensions) return () => null as any
+    const {width, height, scaleX, scaleY} = dimensions
 
     let points: Point[] = clusters.flatMap((cluster) =>
       cluster.arguments.map((arg) => ({
@@ -26,11 +26,11 @@ const useVoronoiFinder = (
         ...comments[arg.comment_id],
         color: color(cluster.cluster_id),
       }))
-    );
+    )
 
     // filterFnがあればpointをフィルタ
     if (filterFn) {
-      points = points.filter(filterFn);
+      points = points.filter(filterFn)
     }
 
     const layout = voronoi<Point>({
@@ -38,18 +38,18 @@ const useVoronoiFinder = (
       y: (d) => scaleY(d.y),
       width,
       height,
-    })(points);
+    })(points)
     return (mouseEvent: any) => {
       // FIXME mouseEvent 以外が渡されることがある
-      const rect = mouseEvent.target?.getBoundingClientRect!() || { left: 0, top: 0 }; // FIXME
-      const x = zoom.unZoomX(mouseEvent.clientX - rect.left);
-      const y = zoom.unZoomY(mouseEvent.clientY - rect.top);
-      const found = layout.find(x, y, radius);
+      const rect = mouseEvent.target?.getBoundingClientRect!() || {left: 0, top: 0} // FIXME
+      const x = zoom.unZoomX(mouseEvent.clientX - rect.left)
+      const y = zoom.unZoomY(mouseEvent.clientY - rect.top)
+      const found = layout.find(x, y, radius)
       if (onlyCluster && found && found.data.cluster_id !== onlyCluster)
-        return null;
-      return found;
-    };
-  }, [clusters, dimensions, filterFn]);
-};
+        return null
+      return found
+    }
+  }, [clusters, dimensions, filterFn])
+}
 
-export default useVoronoiFinder;
+export default useVoronoiFinder
