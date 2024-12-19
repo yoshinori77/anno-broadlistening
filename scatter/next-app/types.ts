@@ -49,12 +49,14 @@ export type Translations = {
   [id: string]: string[];
 };
 
+export type PropertyMap = { [key: string]: { [arg_id: string]: string } };
 export type Result = {
   clusters: Cluster[];
   comments: CommentsMap;
   translations: Translations;
   config: Config;
   overview: string;
+  propertyMap: PropertyMap | undefined;
 };
 
 export type Dimensions = {

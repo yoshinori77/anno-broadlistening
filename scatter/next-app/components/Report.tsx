@@ -32,7 +32,7 @@ const ResponsiveMap = (props: any) => {
 
 function Report(props: ReportProps) {
   const [openMap, setOpenMap] = useState<string | null>(null);
-  const { config, clusters, translations, overview } = props;
+  const { config, clusters, translations, overview, propertyMap } = props;
   const color = useClusterColor(clusters.map((c) => c.cluster_id));
   const scroll = useRef(0);
   const translator = useTranslatorAndReplacements(
