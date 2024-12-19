@@ -9,7 +9,9 @@
     "options": {
       "limit": 1000,
       "workers": 1,
-      "properties": []
+      "properties": [],
+      "categories": {},
+      "category_batch_size": 5
     },
     "use_llm": true
   },

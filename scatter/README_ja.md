@@ -136,6 +136,12 @@ open http://localhost:8080/pipeline/outputs/my-project/report/
     limit?: number // 処理する行の最大数（デフォルトは1000）
     workers?: number // 並行ワーカーの最大数（デフォルトは1）
     properties?: string[] // 抽出するプロパティのリスト（デフォルトは[]）。抽出されたプロパティは出力ファイルに追加されます。
+    categories?: { 
+      [key: string]: { // カテゴリのグループ名 (例: "sentiment", "genre")
+        [key: string]: string // 各カテゴリの名前とその説明
+      }
+    } // argsに付与するカテゴリの定義。キーはカテゴリグループ名、値は各カテゴリの説明のオブジェクト。categoriesが存在する場合はLLMを用いたカテゴリ分類がextraction内部で実行される。
+    category_batch_size?: number // 一度のバッチ処理で分類するコメントの数 (デフォルトは5)
   },
   clustering: {
     clusters?: number // 生成するクラスターの数（デフォルトは8）

@@ -160,6 +160,13 @@ extraction?: {
   limit?: number // maximal number of rows to process (default to 1000)
   workers?: number // maximal number of parallel workers (default to 1)
   properties?: string[] // list of properties to extract from the input file (default to []). extracted properties will be added to the output file.
+   categories?: { 
+    [key: string]: { // Name of the category group (e.g., "sentiment", "genre")
+      [key: string]: string // Name and description of each category
+    }
+  } // Definition of categories to be assigned to comments. Keys are category group names, and values are objects describing each category. If categories are defined, LLM will be used for category classification.
+  category_batch_size?: number // Number of comments to classify in one batch process (default is 5)
+
 },
 clustering: {
   clusters?: number // number of clusters to generate (default to 8)
