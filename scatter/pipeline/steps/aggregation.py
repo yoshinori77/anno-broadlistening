@@ -53,7 +53,7 @@ def _build_property_map(
     property_map = defaultdict(dict)
     for prop in property_columns:
         for arg_id, row in arguments.iterrows():
-            # LLMによるclassificationがうまく行かず、NaNの場合はNoneにする
+            # LLMによるcategory classificationがうまく行かず、NaNの場合はNoneにする
             property_map[prop][arg_id] = row[prop] if not pd.isna(row[prop]) else None
     return property_map
 
@@ -202,8 +202,7 @@ def aggregation(config):
     property_columns = list(hidden_properties_map.keys()) + list(
         config["extraction"]["categories"].keys()
     )
-    property_map = _build_property_map(arguments, property_columns)
-    results["propertyMap"] = property_map
+    results["propertyMap"] = _build_property_map(arguments, property_columns)
 
     with open(path, "w") as file:
         json.dump(results, file, indent=2)
