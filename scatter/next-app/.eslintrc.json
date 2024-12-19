@@ -3,6 +3,9 @@
     "next/core-web-vitals",
     "next/typescript"
   ],
+  "plugins": [
+    "import"
+  ],
   "rules": {
     "quotes": ["error", "single"],
     "semi": ["error", "never"],
@@ -16,6 +19,15 @@
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_",
         "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
       }
     ]
   }

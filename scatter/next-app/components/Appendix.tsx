@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react'
-import {Config} from '@/types'
-import {Translator} from '@/hooks/useTranslatorAndReplacements'
 import {diffWords} from 'diff'
+import React, {useEffect, useState} from 'react'
+import {Translator} from '@/hooks/useTranslatorAndReplacements'
+import {Config} from '@/types'
 
 type Props = {
   config: Config,

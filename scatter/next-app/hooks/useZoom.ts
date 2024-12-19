@@ -1,5 +1,5 @@
-import {Dimensions} from '@/types'
 import {MouseEventHandler, useState, WheelEventHandler} from 'react'
+import {Dimensions} from '@/types'
 
 const minZoom = 0.2
 const maxZoom = 5

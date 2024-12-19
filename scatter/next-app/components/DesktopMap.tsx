@@ -1,45 +1,45 @@
+import {IconProp} from '@fortawesome/fontawesome-svg-core'
+import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {useGesture} from '@use-gesture/react'
 import React, {useEffect, useRef, useState} from 'react'
-import {Argument, Cluster, FavoritePoint, Point, PropertyMap, Result} from '@/types'
+import CustomTitle from '@/components/CustomTitle'
 import Tooltip from '@/components/DesktopTooltip'
 import useAutoResize from '@/hooks/useAutoResize'
-import useRelativePositions from '@/hooks/useRelativePositions'
-import useVoronoiFinder from '@/hooks/useVoronoiFinder'
-import useInferredFeatures from '@/hooks/useInferredFeatures'
-import useZoom from '@/hooks/useZoom'
-import useFilter from '@/hooks/useFilter'
-import {mean} from '@/utils'
-import {Translator} from '@/hooks/useTranslatorAndReplacements'
 import {ColorFunc} from '@/hooks/useClusterColor'
-import {useGesture} from '@use-gesture/react'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
-import CustomTitle from '@/components/CustomTitle'
-import {IconProp} from '@fortawesome/fontawesome-svg-core'
+import useFilter from '@/hooks/useFilter'
+import useInferredFeatures from '@/hooks/useInferredFeatures'
+import useRelativePositions from '@/hooks/useRelativePositions'
+import {Translator} from '@/hooks/useTranslatorAndReplacements'
+import useVoronoiFinder from '@/hooks/useVoronoiFinder'
+import useZoom from '@/hooks/useZoom'
+import {Argument, Cluster, FavoritePoint, Point, PropertyMap, Result} from '@/types'
+import {mean} from '@/utils'
 
 type TooltipPosition = {
-  x: number;
-  y: number;
-};
+  x: number
+  y: number
+}
 
 type MapProps = Result & {
-  width?: number;
-  height?: number;
-  padding?: number;
-  className?: string;
-  fullScreen?: boolean;
-  back?: () => void;
-  onlyCluster?: string;
-  translator: Translator;
-  color: ColorFunc;
+  width?: number
+  height?: number
+  padding?: number
+  className?: string
+  fullScreen?: boolean
+  back?: () => void
+  onlyCluster?: string
+  translator: Translator
+  color: ColorFunc
   config: {
-    name: string;
-    description?: string;
-    question?: string;
-  };
-  propertyMap: PropertyMap;
-};
+    name: string
+    description?: string
+    question?: string
+  }
+  propertyMap: PropertyMap
+}
 
-type PropertyFilter = { [key: string]: string };
+type PropertyFilter = { [key: string]: string }
 
 const truncateText = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text

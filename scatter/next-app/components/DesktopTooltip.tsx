@@ -1,11 +1,11 @@
-import React from 'react'
-import {Dimensions, Point} from '@/types'
-import {Translator} from '@/hooks/useTranslatorAndReplacements'
-import {ColorFunc} from '@/hooks/useClusterColor'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
-import {faBookmark as regularBookmark} from '@fortawesome/free-regular-svg-icons'
 import {IconProp} from '@fortawesome/fontawesome-svg-core'
+import {faBookmark as regularBookmark} from '@fortawesome/free-regular-svg-icons'
+import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import React from 'react'
+import {ColorFunc} from '@/hooks/useClusterColor'
+import {Translator} from '@/hooks/useTranslatorAndReplacements'
+import {Dimensions, Point} from '@/types'
 
 type TooltipProps = {
   point: Point

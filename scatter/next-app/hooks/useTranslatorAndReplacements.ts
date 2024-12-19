@@ -1,8 +1,8 @@
+import * as OpenCC from 'opencc-js'
 import {useCallback, useMemo, useState} from 'react'
 import {Cluster, Config, Translations} from '@/types'
-import * as OpenCC from 'opencc-js'
 
-let missing: { [key: string]: boolean } = {}
+const missing: { [key: string]: boolean } = {}
 
 const JapaneseUI: { [key: string]: string } = {
   Argument: '議論',

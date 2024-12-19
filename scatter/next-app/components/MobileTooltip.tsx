@@ -1,9 +1,9 @@
-import {Zoom} from '@/hooks/useZoom'
-import {Dimensions, Point} from '@/types'
 import {CSSProperties} from 'react'
-import {ThumbDown, ThumbUp} from '@/icons'
-import {Translator} from '@/hooks/useTranslatorAndReplacements'
 import VideoLink from './VideoLink'
+import {Translator} from '@/hooks/useTranslatorAndReplacements'
+import {Zoom} from '@/hooks/useZoom'
+import {ThumbDown, ThumbUp} from '@/icons'
+import {Dimensions, Point} from '@/types'
 
 type TooltipProps = {
   point: Point

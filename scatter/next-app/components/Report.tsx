@@ -1,19 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react'
-import {Result} from '@/types'
+import AfterAppendix from './AfterAppendix'
+import Appendix from './Appendix'
+import CustomHeader from './CustomHeader'
+import CustomIntroduction from './CustomIntroduction'
+import DesktopMap from './DesktopMap'
+import Header from './Header'
+import MobileMap from './MobileMap'
+import Outline from './Outline'
 import useClusterColor from '@/hooks/useClusterColor'
 import useTranslatorAndReplacements from '@/hooks/useTranslatorAndReplacements'
-import MobileMap from './MobileMap'
-import DesktopMap from './DesktopMap'
+import {Result} from '@/types'
 
-import Header from './Header'
-import Appendix from './Appendix'
-import Outline from './Outline'
-import CustomIntroduction from './CustomIntroduction'
-
-import CustomHeader from './CustomHeader'
-import AfterAppendix from './AfterAppendix'
-
-type ReportProps = Result;
+type ReportProps = Result
 
 const isMobileDevice = () => {
   const mobilePattern = /Android|webOS|iPhone|iPad|Opera Mini/i

@@ -1,9 +1,9 @@
-import {useMemo} from 'react'
 import {voronoi} from '@visx/voronoi'
-import {Argument, Cluster, CommentsMap, Dimensions, Point} from '@/types'
+import {useMemo} from 'react'
 import {Zoom} from './useZoom'
+import {Argument, Cluster, CommentsMap, Dimensions, Point} from '@/types'
 
-type FilterFn = (arg: Argument) => boolean;
+type FilterFn = (arg: Argument) => boolean
 
 const useVoronoiFinder = (
   clusters: Cluster[],
