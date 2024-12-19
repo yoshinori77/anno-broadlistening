@@ -1,57 +1,57 @@
-import React, {useEffect, useRef, useState} from 'react'
-import {Result} from '@/types'
-import useClusterColor from '@/hooks/useClusterColor'
-import useTranslatorAndReplacements from '@/hooks/useTranslatorAndReplacements'
-import MobileMap from './MobileMap'
-import DesktopMap from './DesktopMap'
+import React, { useState, useEffect, useRef } from "react";
+import { Result } from "@/types";
+import useClusterColor from "@/hooks/useClusterColor";
+import useTranslatorAndReplacements from "@/hooks/useTranslatorAndReplacements";
+import MobileMap from "./MobileMap";
+import DesktopMap from "./DesktopMap";
 
-import Header from './Header'
-import Appendix from './Appendix'
-import Outline from './Outline'
-import CustomIntroduction from './CustomIntroduction'
+import Header from "./Header";
+import Appendix from "./Appendix";
+import Outline from "./Outline";
+import CustomIntroduction from "./CustomIntroduction";
 
-import CustomHeader from './CustomHeader'
-import AfterAppendix from './AfterAppendix'
+import CustomHeader from "./CustomHeader";
+import AfterAppendix from "./AfterAppendix";
 
-type ReportProps = Result
+type ReportProps = Result;
 
 const isMobileDevice = () => {
-  const mobilePattern = /Android|webOS|iPhone|iPad|Opera Mini/i
-  return mobilePattern.test(navigator.userAgent)
-}
+  const mobilePattern = /Android|webOS|iPhone|iPad|Opera Mini/i;
+  return mobilePattern.test(navigator.userAgent);
+};
 
 const ResponsiveMap = (props: any) => {
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setIsMobile(isMobileDevice())
-  }, [])
+    setIsMobile(isMobileDevice());
+  }, []);
 
-  return isMobile ? <MobileMap {...props} /> : <DesktopMap {...props} />
-}
+  return isMobile ? <MobileMap {...props} /> : <DesktopMap {...props} />;
+};
 
 function Report(props: ReportProps) {
-  const [openMap, setOpenMap] = useState<string | null>(null)
-  const {config, clusters, translations, overview} = props
-  const color = useClusterColor(clusters.map((c) => c.cluster_id))
-  const scroll = useRef(0)
+  const [openMap, setOpenMap] = useState<string | null>(null);
+  const { config, clusters, translations, overview, propertyMap } = props;
+  const color = useClusterColor(clusters.map((c) => c.cluster_id));
+  const scroll = useRef(0);
   const translator = useTranslatorAndReplacements(
     config,
     translations,
     clusters
-  )
+  );
 
   // wait for one tick to avoid SSR issues
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    setReady(true)
-  }, [])
-  if (!ready) return false
+    setReady(true);
+  }, []);
+  if (!ready) return false;
 
-  const {t} = translator
+  const { t } = translator;
   const totalArgs = clusters
     .map((c) => c.arguments.length)
-    .reduce((a, b) => a + b, 0)
+    .reduce((a, b) => a + b, 0);
 
   if (openMap) {
     return (
@@ -60,27 +60,27 @@ function Report(props: ReportProps) {
         color={color}
         translator={translator}
         back={() => {
-          setOpenMap(null)
-          setTimeout(() => window.scrollTo({top: scroll.current}), 0)
+          setOpenMap(null);
+          setTimeout(() => window.scrollTo({ top: scroll.current }), 0);
         }}
         fullScreen
-        onlyCluster={openMap !== 'main' ? openMap : undefined}
+        onlyCluster={openMap !== "main" ? openMap : undefined}
       />
-    )
+    );
   }
   return (
     <>
-      <CustomHeader config={config}/>
+      <CustomHeader config={config} />
       <div className="mt-9">
-        <Outline clusters={clusters} translator={translator}/>
-        <Header {...props} translator={translator}/>
+        <Outline clusters={clusters} translator={translator} />
+        <Header {...props} translator={translator} />
         <div
           className="text-center max-w-3xl m-auto py-8 px-5"
-          style={{display: openMap ? 'none' : 'block',}}
+          style={{ display: openMap ? "none" : "block", }}
         >
           <h2 className="text-xl my-3 font-bold">{t(config.name)}</h2>
           <h1 className="text-3xl my-3 mb-10">{t(config.question)}</h1>
-          <CustomIntroduction config={config} translator={translator}/>
+          <CustomIntroduction config={config} translator={translator} />
 
           <div id="introduction" className="my-4">
             <div id="big-map">
@@ -94,15 +94,15 @@ function Report(props: ReportProps) {
               <button
                 className="my-2 underline"
                 onClick={() => {
-                  scroll.current = window.scrollY
-                  setOpenMap('main')
+                  scroll.current = window.scrollY;
+                  setOpenMap("main");
                 }}
               >
-                {t('Open full-screen map')}
+                {t("Open full-screen map")}
               </button>
             </div>
             <div id="overview" className="text-left font-bold my-3">
-              {t('Overview')}:
+              {t("Overview")}:
             </div>
             <div className="text-left">{t(overview)}</div>
           </div>
@@ -116,17 +116,17 @@ function Report(props: ReportProps) {
                 >
                   <h2
                     className="text-2xl font-semibold my-2 mt-12"
-                    style={{color: color(cluster.cluster_id)}}
+                    style={{ color: color(cluster.cluster_id) }}
                   >
                     {t(cluster.cluster)}
                   </h2>
                   <div className="text-lg opacity-50 mb-3">
-                    ({cluster.arguments.length} {t('arguments')},
-                    {Math.round((100 * cluster.arguments.length) / totalArgs)}%{' '}
-                    {t('of total')})
+                    ({cluster.arguments.length} {t("arguments")},
+                    {Math.round((100 * cluster.arguments.length) / totalArgs)}%{" "}
+                    {t("of total")})
                   </div>
                   <div className="text-left font-bold my-3">
-                    {t('Cluster analysis')}:
+                    {t("Cluster analysis")}:
                   </div>
                   <div className="text-left">{t(cluster.takeaways)}</div>
                   <div className="my-4">
@@ -141,15 +141,15 @@ function Report(props: ReportProps) {
                     <button
                       className="my-2 underline"
                       onClick={() => {
-                        scroll.current = window.scrollY
-                        setOpenMap(cluster.cluster_id)
+                        scroll.current = window.scrollY;
+                        setOpenMap(cluster.cluster_id);
                       }}
                     >
-                      {t('Open full-screen map')}
+                      {t("Open full-screen map")}
                     </button>
                   </div>
                   <div className="text-left font-bold my-3">
-                    {t('Representative comments')}:
+                    {t("Representative comments")}:
                   </div>
                   <ul className="text-left list-outside list-disc ml-6 ">
                     {cluster.arguments
@@ -164,12 +164,12 @@ function Report(props: ReportProps) {
                 </div>
               ))}
           </div>
-          <Appendix config={config} translator={translator}/>
-          <AfterAppendix/>
+          <Appendix config={config} translator={translator} />
+          <AfterAppendix />
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Report
+export default Report;
