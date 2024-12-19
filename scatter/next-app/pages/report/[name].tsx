@@ -1,8 +1,8 @@
 import {GetStaticPropsContext} from 'next'
-
-const outputs = '../pipeline/outputs'
 import Report from '../../components/Report'
 import {Result} from '../../types'
+
+const outputs = '../pipeline/outputs'
 
 export async function getStaticPaths() {
   const report = process.env.REPORT
