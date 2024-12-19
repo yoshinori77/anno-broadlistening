@@ -12,8 +12,8 @@ const useVoronoiFinder = (
   zoom: Zoom,
   dimensions?: Dimensions,
   onlyCluster?: string,
-  radius = 30,
-  filterFn?: FilterFn
+  baseRadius = 20,
+  filterFn?: FilterFn,
 ) => {
   return useMemo(() => {
     if (!dimensions) return () => null as any
@@ -39,17 +39,41 @@ const useVoronoiFinder = (
       width,
       height,
     })(points)
+
     return (mouseEvent: any) => {
       // FIXME mouseEvent 以外が渡されることがある
       const rect = mouseEvent.target?.getBoundingClientRect!() || {left: 0, top: 0} // FIXME
       const x = zoom.unZoomX(mouseEvent.clientX - rect.left)
       const y = zoom.unZoomY(mouseEvent.clientY - rect.top)
-      const found = layout.find(x, y, radius)
+      const adjustedRadius = baseRadius / zoom.scale
+      const found = layout.find(x, y, adjustedRadius)
+
+      // DEBUG 当たり判定の円を表示
+      // const svg = document.querySelector('svg')
+      // if (svg) {
+      //   const existingCircle = svg.querySelector('#adjusted-radius-circle')
+      //   if (existingCircle) {
+      //     existingCircle.setAttribute('cx', String(mouseEvent.clientX))
+      //     existingCircle.setAttribute('cy', String(mouseEvent.clientY))
+      //     existingCircle.setAttribute('r', String(adjustedRadius * zoom.scale))
+      //   } else {
+      //     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+      //     circle.setAttribute('id', 'adjusted-radius-circle')
+      //     circle.setAttribute('cx', String(mouseEvent.clientX))
+      //     circle.setAttribute('cy', String(mouseEvent.clientY))
+      //     circle.setAttribute('r', String(adjustedRadius * zoom.scale))
+      //     circle.setAttribute('fill', 'none')
+      //     circle.setAttribute('stroke', 'red')
+      //     circle.setAttribute('stroke-width', '1')
+      //     svg.appendChild(circle)
+      //   }
+      // }
+
       if (onlyCluster && found && found.data.cluster_id !== onlyCluster)
         return null
       return found
     }
-  }, [clusters, dimensions, filterFn])
+  }, [clusters, dimensions, filterFn, zoom])
 }
 
 export default useVoronoiFinder

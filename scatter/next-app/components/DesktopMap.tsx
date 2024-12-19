@@ -91,7 +91,7 @@ function DotCircles(
           className="pointer-events-none"
           key={arg_id}
           id={arg_id}
-          cx={zoom.zoomX(scaleX(x) + 20)}
+          cx={zoom.zoomX(scaleX(x))}
           cy={zoom.zoomY(scaleY(y))}
           fill={color(cluster.cluster_id, onlyCluster)}
           opacity={calculatedOpacity}
@@ -375,7 +375,7 @@ function DesktopMap(props: MapProps) {
 
   }, [clusters, dimensions, fullScreen])
 
-  const TOOLTIP_WIDTH = 200
+  const TOOLTIP_WIDTH = 300
 
   const calculateTooltipPosition = (clientX: number, clientY: number) => {
 
