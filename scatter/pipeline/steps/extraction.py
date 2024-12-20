@@ -33,6 +33,7 @@ def extraction(config):
     limit = config["extraction"]["limit"]
     property_columns = config["extraction"]["properties"]
     _validate_property_columns(property_columns, comments)
+    map(int, comments["comment-id"].values)  # test all comment-id can be parsed as int
     comment_ids = (comments["comment-id"].values)[:limit]
     comments.set_index("comment-id", inplace=True)
     results = pd.DataFrame()
