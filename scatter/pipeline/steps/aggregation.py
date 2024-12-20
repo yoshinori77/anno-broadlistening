@@ -51,6 +51,15 @@ def _build_property_map(
     arguments: pd.DataFrame, property_columns: list[str]
 ) -> dict[str, dict[str, str]]:
     property_map = defaultdict(dict)
+
+    # 指定された property_columns が arguments に存在するかチェック
+    missing_cols = [col for col in property_columns if col not in arguments.columns]
+    if missing_cols:
+        raise ValueError(
+            f"指定されたカラム {missing_cols} が args.csv に存在しません。"
+            "設定ファイルaggregation / hidden_propertiesから該当カラムを取り除いてください。"
+        )
+
     for prop in property_columns:
         for arg_id, row in arguments.iterrows():
             # LLMによるcategory classificationがうまく行かず、NaNの場合はNoneにする

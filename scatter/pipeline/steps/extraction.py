@@ -62,6 +62,8 @@ def extraction(config):
                     )
                     existing_arguments.add(arg)
         update_progress(config, incr=len(batch))
+    if results.shape == (0, 0):
+        raise RuntimeError("result is empty, maybe bad prompt")
 
     classification_categories = config["extraction"]["categories"]
     if classification_categories:
