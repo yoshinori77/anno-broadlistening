@@ -19,12 +19,12 @@ BASE_CLASSIFICATION_PROMPT = """与えられた意見群をカテゴリに分類
 # 出力例
 {{
     "arg-id-1": {{
-        "sentiment": "positive",
-        "genre": "politics",
+        "カテゴリ1": "カテゴリ1の分類結果",
+        "カテゴリ2": "カテゴリ2の分類結果",
     }},
     "arg-id-2": {{
-        "sentiment": "negative",
-        "genre": "economy",
+        "カテゴリ1": "カテゴリ1の分類結果",
+        "カテゴリ2": "カテゴリ2の分類結果",
     }}
 }}
 
@@ -97,6 +97,9 @@ def _build_batch_args_string(batch_args: pd.DataFrame) -> str:
 
 
 def _parse_arg_result(classification_results: dict, arg_id: str, categories: list[str]) -> dict:
+    def is_valid_category_value(category_value: str) -> bool:
+        return isinstance(category_value, str) or isinstance(category_value, bool)
+
     arg_result = classification_results.get(arg_id, {})
     if not isinstance(arg_result, dict):
         return {
@@ -108,7 +111,7 @@ def _parse_arg_result(classification_results: dict, arg_id: str, categories: lis
     for category in categories:
         category_value = arg_result.get(category, None)
         # カテゴリの値はstrのみを想定（2024/12/19時点）
-        parsed_result[category] = category_value if isinstance(category_value, str) else None
+        parsed_result[category] = category_value if is_valid_category_value(category_value) else None
     return parsed_result
 
 
