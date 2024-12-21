@@ -8,6 +8,8 @@ from tqdm import tqdm
 
 from services.category_classification import classify_args
 from services.llm import request_to_chat_openai
+from services.parse_json_list import parse_response
+
 from utils import update_progress
 
 COMMA_AND_SPACE_AND_RIGHT_BRACKET = re.compile(r",\s*(\])")
@@ -126,24 +128,7 @@ def extract_arguments(input, prompt, model, retries=1):
     ]
     try:
         response = request_to_chat_openai(messages=messages, model=model, is_json=False)
-        response = (
-            COMMA_AND_SPACE_AND_RIGHT_BRACKET.sub(r"\1", response)
-            .replace("```json", "")
-            .replace("```", "")
-        )
-        obj = json.loads(response)
-        # LLM sometimes returns valid JSON string
-        if isinstance(obj, str):
-            obj = [obj]
-        try:
-            items = [a.strip() for a in obj]
-        except Exception as e:
-            print("Error:", e)
-            print("Input was:", input)
-            print("Response was:", response)
-            print("JSON was:", obj)
-            print("skip")
-            items = []
+        items = parse_response(response)
         items = filter(None, items)  # omit empty strings
         return items
     except json.decoder.JSONDecodeError as e:
