@@ -33,7 +33,15 @@ def extraction(config):
     limit = config["extraction"]["limit"]
     property_columns = config["extraction"]["properties"]
     _validate_property_columns(property_columns, comments)
-    map(int, comments["comment-id"].values)  # test all comment-id can be parsed as int
+    try:
+        # test all comment-id can be parsed as int
+        list(map(int, comments["comment-id"].values))
+    except Exception as e:
+        print(
+            f"inputs/{config['input']}.csv の comment-id に整数でないものが含まれています",
+            e,
+        )
+        raise e
     comment_ids = (comments["comment-id"].values)[:limit]
     comments.set_index("comment-id", inplace=True)
     results = pd.DataFrame()
