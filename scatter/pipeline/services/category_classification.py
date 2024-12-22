@@ -143,13 +143,17 @@ def classify_args(args: pd.DataFrame, config, workers: int) -> pd.DataFrame:
         future_to_batch = {
             executor.submit(
                 classify_batch_args,
-                args.loc[batch_idx : batch_idx + batch_size],
+                args.loc[batch_idx: batch_idx + batch_size],
                 config["extraction"]["categories"],
                 config["extraction"]["model"],
             ): batch_idx
-            for batch_idx in tqdm(batch_start_indices, desc="Classifying arguments")
+            for batch_idx in batch_start_indices
         }
-        for future in concurrent.futures.as_completed(future_to_batch):
+        for future in tqdm(
+            concurrent.futures.as_completed(future_to_batch),
+            total=len(batch_start_indices),
+            desc="Classifying arguments"
+        ):
             result = future.result()
             classification_results.update(result)
 
