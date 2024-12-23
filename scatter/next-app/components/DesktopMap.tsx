@@ -64,19 +64,13 @@ function DotCircles(
       const {arg_id, x, y} = arg
       const isCurrentTooltip = tooltip?.arg_id === arg_id
 
-      let calculatedOpacity
-      const DEFAULT_OPACITY = 1
-      const LIGHT_OPACITY = 0.3
+      let dotClass = 'default'
       if (expanded) {
-        if (isCurrentTooltip) {
-          calculatedOpacity = DEFAULT_OPACITY
-        } else {
-          calculatedOpacity = LIGHT_OPACITY
+        if (!isCurrentTooltip) {
+          dotClass = 'obscure'
         }
-      } else if (filterFn(arg)) {
-        calculatedOpacity = DEFAULT_OPACITY
-      } else {
-        calculatedOpacity = LIGHT_OPACITY
+      } else if (!filterFn(arg)) {
+        dotClass = 'obscure'
       }
 
       let calculatedRadius
@@ -88,13 +82,12 @@ function DotCircles(
 
       return (
         <circle
-          className="pointer-events-none"
+          className={`pointer-events-none ${dotClass}`}
           key={arg_id}
           id={arg_id}
           cx={zoom.zoomX(scaleX(x))}
           cy={zoom.zoomY(scaleY(y))}
           fill={color(cluster.cluster_id, onlyCluster)}
-          opacity={calculatedOpacity}
           r={calculatedRadius}
         />
       )
