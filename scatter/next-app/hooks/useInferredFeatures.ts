@@ -7,7 +7,7 @@ const useInferredFeatures = (props: Result) => {
     const comment0 = comments[Object.keys(comments)[0]]
     const langs = config.translation?.languages || []
     return {
-      dataHasVotes: comment0.hasOwnProperty('agrees'),
+      dataHasVotes: comment0 && comment0.hasOwnProperty('agrees'),
       hasTranslations: langs.length > 0,
     }
   }, [])
