@@ -143,6 +143,9 @@ open http://localhost:8080/pipeline/outputs/my-project/report/
     } // argsに付与するカテゴリの定義。キーはカテゴリグループ名、値は各カテゴリの説明のオブジェクト。categoriesが存在する場合はLLMを用いたカテゴリ分類がextraction内部で実行される。
     category_batch_size?: number // 一度のバッチ処理で分類するコメントの数 (デフォルトは5)
   },
+  embedding?: {
+    model?: string // 埋め込みステップのためのモデル名。"text-embedding-3-small" と "text-embedding-3-large" をサポート。デフォルトは "text-embedding-3-small"
+  },
   clustering: {
     clusters?: number // 生成するクラスターの数（デフォルトは8）
   },
