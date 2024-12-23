@@ -8,29 +8,42 @@ from tqdm import tqdm
 
 load_dotenv("../../.env")
 
-EMBEDDING_MODEL = "text-embedding-3-large"
+EMBDDING_MODELS = [
+    "text-embedding-3-large",
+    "text-embedding-3-small",
+]
 
 
-def embed_by_openai(args):
+def _validate_model(model):
+    if model not in EMBDDING_MODELS:
+        raise RuntimeError(
+            f"Invalid embedding model: {model}, available models: {EMBDDING_MODELS}"
+        )
+
+
+def embed_by_openai(args, model):
     if os.getenv("USE_AZURE"):
         embeds = AzureOpenAIEmbeddings(
-            model=EMBEDDING_MODEL,
+            model=model,
             azure_endpoint=os.getenv("AZURE_EMBEDDING_ENDPOINT"),
         ).embed_documents(args)
     else:
-        embeds = OpenAIEmbeddings(model=EMBEDDING_MODEL).embed_documents(args)
+        _validate_model(model)
+        embeds = OpenAIEmbeddings(model=model).embed_documents(args)
     return embeds
 
 
 def embedding(config):
+    model = config["embedding"]["model"]
+
     dataset = config["output_dir"]
     path = f"outputs/{dataset}/embeddings.pkl"
     arguments = pd.read_csv(f"outputs/{dataset}/args.csv")
     embeddings = []
     batch_size = 1000
     for i in tqdm(range(0, len(arguments), batch_size)):
-        args = arguments["argument"].tolist()[i : i + batch_size]
-        embeds = embed_by_openai(args)
+        args = arguments["argument"].tolist()[i: i + batch_size]
+        embeds = embed_by_openai(args, model)
         embeddings.extend(embeds)
     df = pd.DataFrame(
         [

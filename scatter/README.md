@@ -168,6 +168,9 @@ extraction?: {
   category_batch_size?: number // Number of comments to classify in one batch process (default is 5)
 
 },
+embedding?: {
+  model?: string // model name for embedding step. supports "text-embedding-3-small" and "text-embedding-3-large". Defaults to "text-embedding-3-small"
+},
 clustering: {
   clusters?: number // number of clusters to generate (default to 8)
 }

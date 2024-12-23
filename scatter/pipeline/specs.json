@@ -19,8 +19,11 @@
     "step": "embedding",
     "filename": "embeddings.pkl",
     "dependencies": {
-      "params": [],
+      "params": ["model"],
       "steps": ["extraction"]
+    },
+    "options": {
+      "model": "text-embedding-3-small"
     }
   },
   {
