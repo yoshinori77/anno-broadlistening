@@ -201,6 +201,29 @@ outputs
 
 `result.json`には、`args.csv`、`clusters.csv`、`labels.csv`、および`translations.json`の内容が含まれています。これらのファイルはキャッシュの目的でのみ保持されています。わずかに異なるパラメータでパイプラインを再実行する場合に備えて、すべてのデータを再計算する必要がないようにするためです。
 
+## 文化庁「AIと著作権」バブリックコメントデータセット
+
+`dataset-aipubcom`ブランチに[文科省が公開した「AIと著作権に関する考え方について（素案）」に関するパブリックコメント](https://www.bunka.go.jp/seisaku/bunkashingikai/chosakuken/hoseido/r05_07/)のデータを元に作成したデータセットおよび分析中間データ、生成されたレポートが入っています。Talk to the Cityの分析の各ステップを改善していく上で、サンプルとして扱える大規模なデータがあると便利だからです。たとえば、Webブラウザでの表示の改善ではrasults.jsonさえあればよく、クラスタリング手法の改善ではそこまでの処理で作られるargs.csvとembeddings.pklがあれば十分です。
+
+このブランチではembeddings.pklのサイズが大きいことが理由でGit LFSがONになっています。以下は、LFSの簡単なガイドです。
+
+### Git LFS の導入
+プロジェクト内の大容量ファイル（例: `embedding.pkl`）は Git LFS で管理しています。  参加する方は、以下を実行してください。
+
+1. **Git LFSのインストール**
+    - **Mac**: `brew install git-lfs`
+    - **Windows**: [公式インストーラー](https://git-lfs.github.com/)を使用
+    - **Linux**: `sudo apt-get install git-lfs` 等
+2. **初期化**
+   ```bash
+   git lfs install
+   ```
+
+### ファイルの取得確認
+- 通常どおり `git pull` すれば LFS管理ファイルも取得されます  
+- LFSが導入されていない環境だとポインタだけダウンロードされ、実ファイルが取得されないので注意
+
+
 ## Credits
 
 Earlier versions of this pipeline were developed in collaboration with [@Klingefjord](https://github.com/Klingefjord) and [@lightningorb](https://github.com/lightningorb). The example of data input file was provided by the Recursive Public team (Chatham House, vTaiwan, OpenAI).
