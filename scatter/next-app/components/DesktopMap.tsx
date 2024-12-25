@@ -1,7 +1,14 @@
-import {IconProp} from '@fortawesome/fontawesome-svg-core'
-import {faBookmark as solidBookmark, faXmark} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {useGesture} from '@use-gesture/react'
+import {
+  AtSignIcon,
+  BookmarkCheckIcon,
+  BookMarkedIcon,
+  ChartPieIcon,
+  Minimize2Icon,
+  ScanSearchIcon, SlidersHorizontalIcon,
+  TagIcon,
+  XIcon
+} from 'lucide-react'
 import React, {useEffect, useRef, useState} from 'react'
 import CustomTitle from '@/components/CustomTitle'
 import Tooltip from '@/components/DesktopTooltip'
@@ -38,8 +45,6 @@ type MapProps = Result & {
   }
   propertyMap: PropertyMap
 }
-
-type PropertyFilter = { [key: string]: string }
 
 const truncateText = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text
@@ -162,39 +167,6 @@ function ClusterLabels(
   )
 }
 
-function PropertyFilter(propertyMap: PropertyMap,
-                        propertyFilter: PropertyFilter, setPropertyFilter: React.Dispatch<React.SetStateAction<PropertyFilter>>, t: any) {
-  return <><span className="m-2">{t('属性フィルタ')}</span>
-    {Object.entries(propertyMap).map(([propKey, propValues]) => {
-      const uniqueValues = Array.from(new Set(Object.values(propValues)))
-      uniqueValues.sort() // ABC順にソート
-
-      return (
-        <span key={propKey} className="mb-4">
-        <label className="m-2 font-semibold">{propKey}: </label>
-        <select
-          value={propertyFilter[propKey] ?? ''}
-          onChange={(e) => {
-            // propKeyごとの選択値を状態管理する必要あり
-            setPropertyFilter((prev) => ({
-              ...prev,
-              [propKey]: e.target.value,
-            }))
-          }}
-          className="border p-1 rounded"
-        >
-          <option value="">{t('(すべて)')}</option>
-          {uniqueValues.map((val) => (
-            <option key={val} value={val}>
-              {val}
-            </option>
-          ))}
-        </select>
-      </span>
-      )
-    })}</>
-}
-
 function DesktopMap(props: MapProps) {
   const {
     fullScreen = false,
@@ -264,6 +236,7 @@ function DesktopMap(props: MapProps) {
   const [showFavorites, setShowFavorites] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [showTitle, setShowTitle] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
   const totalArgs = clusters
     .map((c) => c.arguments.length)
@@ -627,45 +600,30 @@ function DesktopMap(props: MapProps) {
           {fullScreen && (
             <div className="absolute top-0 w-full p-2" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
               <div className={'flex justify-between items-center'}>
-                <div>
-                  <button className="m-2 underline" onClick={back}>
-                    {t('Back to report')}
-                  </button>
-                  <button
-                    className="m-2 underline"
-                    onClick={() => setShowLabels(x => !x)}>
-                    {showLabels ? t('Hide labels') : t('Show labels')}
-                  </button>
-                  <button
-                    className="m-2 underline"
-                    onClick={() => setShowTitle(x => !x)}
-                  >
-                    {showTitle ? t('タイトルを非表示') : t('タイトルを表示')}
-                  </button>
-                  <button
-                    className="m-2 underline"
-                    onClick={() => setShowRatio(x => !x)}
-                  >
-                    {showRatio ? t('割合を非表示') : t('割合を表示')}
-                  </button>
-                  {zoom.reset && (
-                    <button
-                      className="m-2 underline"
-                      onClick={zoom.reset as any}
-                    >
-                      {t('Reset zoom')}
+                <div className={'flex'}>
+                  {propertyMap && (
+                    <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowSettings(x => !x)}>
+                      <SlidersHorizontalIcon className={showSettings ? 'text-blue-500' : 'text-gray-500'}/>
+                      <p className={'text-xs text-gray-700'}>{t('toolboxFilterSettings')}</p>
                     </button>
                   )}
-                  <input
-                    type="text"
-                    placeholder={t('検索')}
-                    value={highlightText}
-                    onChange={(e) => setHighlightText(e.target.value)}
-                    className="w-20 mx-2 p-2 border rounded"
-                  />
-
-                  {/* PROPERTY FILTER */}
-                  {propertyMap && PropertyFilter(propertyMap, propertyFilter, setPropertyFilter, t)}
+                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowLabels(x => !x)}>
+                    <TagIcon className={showLabels ? 'text-blue-500' : 'text-gray-500'}/>
+                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayLabels')}</p>
+                  </button>
+                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowTitle(x => !x)}>
+                    <AtSignIcon className={showTitle ? 'text-blue-500' : 'text-gray-500'}/>
+                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayTitle')}</p>
+                  </button>
+                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowRatio(x => !x)}>
+                    <ChartPieIcon className={showRatio ? 'text-blue-500' : 'text-gray-500'}/>
+                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayPercentage')}</p>
+                  </button>
+                  <button className="w-[80px] m-1 flex flex-col items-center"
+                          onClick={() => typeof zoom.reset === 'function' && zoom.reset()}>
+                    <ScanSearchIcon className={zoom.reset ? 'text-blue-500' : 'text-gray-500'}/>
+                    <p className={'text-xs text-gray-700'}>{t('toolboxResetPosition')}</p>
+                  </button>
 
                   {dataHasVotes && (
                     <button
@@ -733,18 +691,76 @@ function DesktopMap(props: MapProps) {
                     </div>
                   )}
                 </div>
-                <div>
-                  <button
-                    className="m-2 underline"
-                    onClick={() => setShowFavorites(x => !x)}
-                  >
-                    {showFavorites ? t('お気に入りを非表示') : t('お気に入りを表示')}
+                <div className={'flex justify-between items-center'}>
+                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowFavorites(x => !x)}>
+                    <BookMarkedIcon className={'text-gray-700'}/>
+                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayFavorites')}</p>
+                  </button>
+                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={back}>
+                    <Minimize2Icon className={'text-gray-700'}/>
+                    <p className={'text-xs text-gray-700'}>{t('toolboxExitFullScreen')}</p>
                   </button>
                 </div>
               </div>
             </div>
           )}
         </div>
+
+        {/* フィルター一覧 */}
+        {(fullScreen && propertyMap && showSettings) && (
+          <div
+            className="absolute top-0 left-0 w-[400px] p-4 bg-gray-100 overflow-y-auto z-10 h-full shadow-md"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-md font-bold">
+                {translator.t('toolboxFilterSettings')}
+              </h2>
+              <button onClick={() => {
+                setShowSettings(!showSettings)
+              }}>
+                <XIcon/>
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder={t('検索')}
+              value={highlightText}
+              onChange={(e) => setHighlightText(e.target.value)}
+              className="w-full p-2 border rounded"
+            />
+            <dl>
+              {Object.entries(propertyMap).map(([propKey, propValues]) => {
+                const uniqueValues = Array.from(new Set(Object.values(propValues)))
+                uniqueValues.sort() // ABC順にソート
+                return (
+                  <div key={propKey}>
+                    <dt>{propKey}</dt>
+                    <dd>
+                      <select
+                        value={propertyFilter[propKey] ?? ''}
+                        onChange={(e) => {
+                          // propKeyごとの選択値を状態管理する必要あり
+                          setPropertyFilter((prev) => ({
+                            ...prev,
+                            [propKey]: e.target.value,
+                          }))
+                        }}
+                        className="border p-1 rounded w-full"
+                      >
+                        <option value="">{t('(すべて)')}</option>
+                        {uniqueValues.map((val) => (
+                          <option key={val} value={val}>
+                            {val}
+                          </option>
+                        ))}
+                      </select>
+                    </dd>
+                  </div>
+                )
+              })}
+            </dl>
+          </div>
+        )}
 
         {/* お気に入り一覧 */}
         {(fullScreen && showFavorites) && (
@@ -756,7 +772,7 @@ function DesktopMap(props: MapProps) {
                 {translator.t('お気に入り一覧')}
               </h2>
               <button onClick={() => {setShowFavorites(!showFavorites)}}>
-                <FontAwesomeIcon icon={faXmark as IconProp} size={'lg'} />
+                <XIcon />
               </button>
             </div>
             {favorites.length === 0 ? (
@@ -787,7 +803,7 @@ function DesktopMap(props: MapProps) {
                           onClick={() => toggleFavorite(fav)}
                           className="text-amber-500 text-lg focus:outline-none ml-2"
                         >
-                          <FontAwesomeIcon icon={solidBookmark as IconProp}/>
+                          <BookmarkCheckIcon />
                         </button>
                       </div>
 

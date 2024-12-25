@@ -46,6 +46,15 @@ const JapaneseUI: { [key: string]: string } = {
   labelling: 'ラベリング',
   takeaways: 'まとめ',
   overview: '概要',
+  exitFullScreen: '全画面を終了',
+  // 全画面表示ツール
+  toolboxExitFullScreen: '全画面を終了',
+  toolboxDisplayLabels: 'ラベル表示',
+  toolboxDisplayTitle: 'タイトル表示',
+  toolboxDisplayPercentage: '割合表示',
+  toolboxResetPosition: '初期位置に戻す',
+  toolboxDisplayFavorites: 'お気に入り一覧',
+  toolboxFilterSettings: 'フィルター設定',
 }
 
 const useTranslatorAndReplacements = (
