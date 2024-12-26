@@ -1,7 +1,4 @@
-import {IconProp} from '@fortawesome/fontawesome-svg-core'
-import {faBookmark as regularBookmark} from '@fortawesome/free-regular-svg-icons'
-import {faBookmark as solidBookmark} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {BookmarkCheckIcon, BookmarkIcon} from 'lucide-react'
 import React from 'react'
 import {ColorFunc} from '@/hooks/useClusterColor'
 import {Translator} from '@/hooks/useTranslatorAndReplacements'
@@ -88,20 +85,20 @@ function Tooltip(props: TooltipProps) {
         {/* ツールチップの内容 */}
         <div style={{display: 'flex', alignItems: 'center'}}>
           <h3 style={{color: colorFunc(point.cluster_id), margin: 0}}
-              className="text-base sm:text-base md:text-base font-bold">
+            className="text-base sm:text-base md:text-base font-bold">
             {/* ラベルを大きくする */}
             {translator.t(point.cluster)}
           </h3>
           {/* お気に入りボタン */}
           <button
             onClick={() => onToggleFavorite()}
-            className="text-amber-500 text-lg focus:outline-none ml-2"
+            className="text-gray-300 text-lg focus:outline-none ml-2"
             aria-label={
               isFavorite ? t('お気に入りから削除') : t('お気に入りに追加')
             }
             style={{marginLeft: '8px'}}
           >
-            <FontAwesomeIcon icon={isFavorite ? solidBookmark as IconProp : regularBookmark as IconProp}/>
+            {isFavorite ? <BookmarkCheckIcon className={'text-amber-500'}/> : <BookmarkIcon/>}
           </button>
         </div>
         <p className="text-sm sm:text-sm md:text-md mt-2">{point.argument}</p>

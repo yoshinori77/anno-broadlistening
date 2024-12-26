@@ -15,13 +15,13 @@ type TooltipProps = {
 }
 
 const Tooltip = ({
-                   point,
-                   dimensions,
-                   expanded,
-                   zoom,
-                   fullScreen,
-                   translator,
-                 }: TooltipProps) => {
+  point,
+  dimensions,
+  expanded,
+  zoom,
+  fullScreen,
+  translator,
+}: TooltipProps) => {
   const {scaleX, scaleY, width, height} = dimensions
   const {zoomX, zoomY} = zoom
   const {t} = translator

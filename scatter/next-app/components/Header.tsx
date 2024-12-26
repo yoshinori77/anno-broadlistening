@@ -23,7 +23,7 @@ const Header = (props: HeaderProps) => {
           onClick={() => setLangIndex(i)}
         >
           <img className="w-5 inline-block leading-5 pb-[4px] hover:shadow-2xl shadow-white"
-               src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${lang.flag}.svg`} alt=""/>
+            src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${lang.flag}.svg`} alt=""/>
           {/* {t(lang.name)} */}
         </button>)}
       </div>}
