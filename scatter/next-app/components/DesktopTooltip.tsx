@@ -98,7 +98,7 @@ function Tooltip(props: TooltipProps) {
             }
             style={{marginLeft: '8px'}}
           >
-            {isFavorite ? <BookmarkCheckIcon className={'text-amber-500'} /> : <BookmarkIcon />}
+            {isFavorite ? <BookmarkCheckIcon className={'text-amber-500'}/> : <BookmarkIcon/>}
           </button>
         </div>
         <p className="text-sm sm:text-sm md:text-md mt-2">{point.argument}</p>

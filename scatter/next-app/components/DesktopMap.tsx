@@ -1,16 +1,9 @@
 import {useGesture} from '@use-gesture/react'
-import {
-  AtSignIcon,
-  BookmarkCheckIcon,
-  BookMarkedIcon,
-  ChartPieIcon,
-  Minimize2Icon,
-  ScanSearchIcon, SlidersHorizontalIcon,
-  TagIcon,
-  XIcon
-} from 'lucide-react'
 import React, {useEffect, useRef, useState} from 'react'
 import CustomTitle from '@/components/CustomTitle'
+import {DesktopFullscreenFavorites} from '@/components/DesktopFullscreenFavorites'
+import {DesktopFullscreenFilter} from '@/components/DesktopFullscreenFilter'
+import {DesktopFullscreenTools} from '@/components/DesktopFullscreenTools'
 import Tooltip from '@/components/DesktopTooltip'
 import useAutoResize from '@/hooks/useAutoResize'
 import {ColorFunc} from '@/hooks/useClusterColor'
@@ -44,11 +37,6 @@ type MapProps = Result & {
     question?: string
   }
   propertyMap: PropertyMap
-}
-
-const truncateText = (text: string, maxLength: number) => {
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + '...'
 }
 
 function DotCircles(
@@ -234,9 +222,8 @@ function DesktopMap(props: MapProps) {
   const [showLabels, setShowLabels] = useState(true)
   const [showRatio, setShowRatio] = useState(false)
   const [showFavorites, setShowFavorites] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
   const [showTitle, setShowTitle] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
+  const [showFilterSettings, setShowFilterSettings] = useState(false)
 
   const totalArgs = clusters
     .map((c) => c.arguments.length)
@@ -596,227 +583,57 @@ function DesktopMap(props: MapProps) {
               }}
             />
           )}
-          {/* BACK BUTTON と その他のボタン */}
-          {fullScreen && (
-            <div className="absolute top-0 w-full p-2" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-              <div className={'flex justify-between items-center'}>
-                <div className={'flex'}>
-                  {propertyMap && (
-                    <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowSettings(x => !x)}>
-                      <SlidersHorizontalIcon className={showSettings ? 'text-blue-500' : 'text-gray-500'}/>
-                      <p className={'text-xs text-gray-700'}>{t('toolboxFilterSettings')}</p>
-                    </button>
-                  )}
-                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowLabels(x => !x)}>
-                    <TagIcon className={showLabels ? 'text-blue-500' : 'text-gray-500'}/>
-                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayLabels')}</p>
-                  </button>
-                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowTitle(x => !x)}>
-                    <AtSignIcon className={showTitle ? 'text-blue-500' : 'text-gray-500'}/>
-                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayTitle')}</p>
-                  </button>
-                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowRatio(x => !x)}>
-                    <ChartPieIcon className={showRatio ? 'text-blue-500' : 'text-gray-500'}/>
-                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayPercentage')}</p>
-                  </button>
-                  <button className="w-[80px] m-1 flex flex-col items-center"
-                          onClick={() => typeof zoom.reset === 'function' && zoom.reset()}>
-                    <ScanSearchIcon className={zoom.reset ? 'text-blue-500' : 'text-gray-500'}/>
-                    <p className={'text-xs text-gray-700'}>{t('toolboxResetPosition')}</p>
-                  </button>
-
-                  {dataHasVotes && (
-                    <button
-                      className="m-2 underline"
-                      onClick={() => {
-                        setShowFilters((x) => !x)
-                      }}
-                    >
-                      {showFilters ? t('Hide filters') : t('Show filters')}
-                    </button>
-                  )}
-                  {/* FILTERS */}
-                  {showFilters && (
-                    <div className="absolute w-[400px] top-12 left-2 p-2 border bg-white rounded leading-4">
-                      <div className="flex justify-between">
-                        <button className="inline-block m-2 text-left">
-                          {t('Votes')} {'>'}{' '}
-                          <span className="inline-block w-10">
-                        {minVotes}
-                      </span>
-                        </button>
-                        <input
-                          className="inline-block w-[200px] mr-2"
-                          id="min-votes-slider"
-                          type="range"
-                          min="0"
-                          max="50"
-                          value={minVotes}
-                          onInput={(e) => {
-                            setMinVotes(
-                              parseInt(
-                                (e.target as HTMLInputElement).value
-                              )
-                            )
-                          }}
-                        />
-                      </div>
-                      <div className="flex justify-between">
-                        <button className="inline-block m-2 text-left">
-                          {t('Consensus')} {'>'}{' '}
-                          <span className="inline-block w-10">
-                        {minConsensus}%
-                      </span>
-                        </button>
-                        <input
-                          className="inline-block w-[200px] mr-2"
-                          id="min-consensus-slider"
-                          type="range"
-                          min="50"
-                          max="100"
-                          value={minConsensus}
-                          onInput={(e) => {
-                            setMinConsensus(
-                              parseInt(
-                                (e.target as HTMLInputElement).value
-                              )
-                            )
-                          }}
-                        />
-                      </div>
-                      <div className="text-sm ml-2 mt-2 opacity-70">
-                        {t('Showing')} {voteFilter.filtered}/
-                        {voteFilter.total} {t('arguments')}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className={'flex justify-between items-center'}>
-                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => setShowFavorites(x => !x)}>
-                    <BookMarkedIcon className={'text-gray-700'}/>
-                    <p className={'text-xs text-gray-700'}>{t('toolboxDisplayFavorites')}</p>
-                  </button>
-                  <button className="w-[80px] m-1 flex flex-col items-center" onClick={back}>
-                    <Minimize2Icon className={'text-gray-700'}/>
-                    <p className={'text-xs text-gray-700'}>{t('toolboxExitFullScreen')}</p>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-
-        {/* フィルター一覧 */}
-        {(fullScreen && propertyMap && showSettings) && (
-          <div
-            className="absolute top-0 left-0 w-[400px] p-4 bg-gray-100 overflow-y-auto z-10 h-full shadow-md"
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-md font-bold">
-                {translator.t('toolboxFilterSettings')}
-              </h2>
-              <button onClick={() => {
-                setShowSettings(!showSettings)
-              }}>
-                <XIcon/>
-              </button>
-            </div>
-            <input
-              type="text"
-              placeholder={t('検索')}
-              value={highlightText}
-              onChange={(e) => setHighlightText(e.target.value)}
-              className="w-full p-2 border rounded"
-            />
-            <dl>
-              {Object.entries(propertyMap).map(([propKey, propValues]) => {
-                const uniqueValues = Array.from(new Set(Object.values(propValues)))
-                uniqueValues.sort() // ABC順にソート
-                return (
-                  <div key={propKey}>
-                    <dt>{propKey}</dt>
-                    <dd>
-                      <select
-                        value={propertyFilter[propKey] ?? ''}
-                        onChange={(e) => {
-                          // propKeyごとの選択値を状態管理する必要あり
-                          setPropertyFilter((prev) => ({
-                            ...prev,
-                            [propKey]: e.target.value,
-                          }))
-                        }}
-                        className="border p-1 rounded w-full"
-                      >
-                        <option value="">{t('(すべて)')}</option>
-                        {uniqueValues.map((val) => (
-                          <option key={val} value={val}>
-                            {val}
-                          </option>
-                        ))}
-                      </select>
-                    </dd>
-                  </div>
-                )
-              })}
-            </dl>
-          </div>
+        {/* 全画面メニュー */}
+        {fullScreen && (
+          <DesktopFullscreenTools
+            canFilter={!!propertyMap}
+            zoomReset={zoom.reset}
+            translator={translator}
+            exitFullScreen={back!}
+            showSettings={showFilterSettings}
+            setShowSettings={setShowFilterSettings}
+            showLabels={showLabels}
+            setShowLabels={setShowLabels}
+            showTitle={showTitle}
+            setShowTitle={setShowTitle}
+            showRatio={showRatio}
+            setShowRatio={setShowRatio}
+            showFavorites={showFavorites}
+            setShowFavorites={setShowFavorites}
+          />
         )}
-
+        {/* フィルター一覧 */}
+        {(fullScreen && propertyMap && showFilterSettings) && (
+          <DesktopFullscreenFilter
+            translator={translator}
+            onClose={() => setShowFilterSettings(false)}
+            highlightText={highlightText}
+            setHighlightText={setHighlightText}
+            propertyMap={propertyMap}
+            propertyFilter={propertyFilter}
+            setPropertyFilter={setPropertyFilter}
+            dataHasVotes={dataHasVotes}
+            minVotes={minVotes}
+            setMinVotes={setMinVotes}
+            minConsensus={minConsensus}
+            setMinConsensus={setMinConsensus}
+            voteFilter={voteFilter}
+          />
+        )}
         {/* お気に入り一覧 */}
         {(fullScreen && showFavorites) && (
-          <div
-            className="absolute top-0 right-0 w-[400px] p-4 bg-gray-100 overflow-y-auto z-10 h-full shadow-md"
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-md font-bold">
-                {translator.t('お気に入り一覧')}
-              </h2>
-              <button onClick={() => {setShowFavorites(!showFavorites)}}>
-                <XIcon />
-              </button>
-            </div>
-            {favorites.length === 0 ? (
-              <p>{translator.t('お気に入りがありません')}</p>
-            ) : (
-              <ul>
-                {favorites.map((fav) => {
-                  // クラスタ情報を取得
-                  const cluster = clusters.find((c) => c.cluster_id === fav.cluster_id)
-                  return (
-                    <li
-                      key={fav.arg_id}
-                      className="mb-2 p-2 bg-white rounded shadow flex flex-col"
-                    >
-                      <div className="flex items-center justify-between">
-                        {/* クラスタラベル */}
-                        <h3
-                          className="font-semibold text-md"
-                          style={{
-                            color: cluster ? color(cluster.cluster_id, onlyCluster) : '#000',
-                          }}
-                        >
-                          {translator.t(cluster?.cluster || 'クラスタ')}
-                        </h3>
-
-                        {/* お気に入りボタン */}
-                        <button
-                          onClick={() => toggleFavorite(fav)}
-                          className="text-amber-500 text-lg focus:outline-none ml-2"
-                        >
-                          <BookmarkCheckIcon />
-                        </button>
-                      </div>
-
-                      {/* 引用部分を100文字に制限 */}
-                      <p className="text-md text-gray-700 mt-1">
-                        {truncateText(fav.argument, 100)}
-                      </p>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
+          <DesktopFullscreenFavorites
+            favorites={favorites}
+            clusters={clusters}
+            translator={translator}
+            color={color}
+            onlyCluster={onlyCluster}
+            removeFavorite={(fav) => {
+              setFavorites((prev) => prev.filter((item) => item.arg_id !== fav.arg_id))
+            }}
+            onClose={() => setShowFavorites(false)}
+          />
         )}
       </div>
     </>
