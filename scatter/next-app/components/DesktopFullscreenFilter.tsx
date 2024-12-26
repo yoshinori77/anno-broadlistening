@@ -32,7 +32,7 @@ export function DesktopFullscreenFilter(props: Props) {
       {/* Header */}
       <div className="flex justify-between items-center mb-4 h-[32px]">
         <h2 className="text-md font-bold">
-          {t('toolboxFilterSettings')}
+          {t('toolsFilterSettings')}
         </h2>
         <button onClick={props.onClose}>
           <XIcon/>

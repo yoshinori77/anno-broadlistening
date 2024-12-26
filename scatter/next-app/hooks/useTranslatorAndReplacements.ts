@@ -48,13 +48,13 @@ const JapaneseUI: { [key: string]: string } = {
   overview: '概要',
   exitFullScreen: '全画面を終了',
   // 全画面表示ツール
-  toolboxExitFullScreen: '全画面を終了',
-  toolboxDisplayLabels: 'ラベル表示',
-  toolboxDisplayTitle: 'タイトル表示',
-  toolboxDisplayPercentage: '割合表示',
-  toolboxResetPosition: '初期位置に戻す',
-  toolboxDisplayFavorites: 'お気に入り一覧',
-  toolboxFilterSettings: 'フィルター設定',
+  toolsExitFullScreen: '全画面を終了',
+  toolsDisplayLabels: 'ラベル表示',
+  toolsDisplayTitle: 'タイトル表示',
+  toolsDisplayPercentage: '割合表示',
+  toolsResetPosition: '初期位置に戻す',
+  toolsDisplayFavorites: 'お気に入り一覧',
+  toolsFilterSettings: 'フィルター設定',
 }
 
 const useTranslatorAndReplacements = (

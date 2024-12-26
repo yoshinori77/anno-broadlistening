@@ -36,35 +36,35 @@ export function DesktopFullscreenTools(props: Props) {
           {props.canFilter && (
             <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => props.setShowSettings(x => !x)}>
               <SlidersHorizontalIcon className={props.showSettings ? 'text-blue-500' : 'text-gray-500'}/>
-              <p className={'text-xs text-gray-700'}>{t('toolboxFilterSettings')}</p>
+              <p className={'text-xs text-gray-700'}>{t('toolsFilterSettings')}</p>
             </button>
           )}
           <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => props.setShowLabels(x => !x)}>
             <TagIcon className={props.showLabels ? 'text-blue-500' : 'text-gray-500'}/>
-            <p className={'text-xs text-gray-700'}>{t('toolboxDisplayLabels')}</p>
+            <p className={'text-xs text-gray-700'}>{t('toolsDisplayLabels')}</p>
           </button>
           <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => props.setShowTitle(x => !x)}>
             <AtSignIcon className={props.showTitle ? 'text-blue-500' : 'text-gray-500'}/>
-            <p className={'text-xs text-gray-700'}>{t('toolboxDisplayTitle')}</p>
+            <p className={'text-xs text-gray-700'}>{t('toolsDisplayTitle')}</p>
           </button>
           <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => props.setShowRatio(x => !x)}>
             <ChartPieIcon className={props.showRatio ? 'text-blue-500' : 'text-gray-500'}/>
-            <p className={'text-xs text-gray-700'}>{t('toolboxDisplayPercentage')}</p>
+            <p className={'text-xs text-gray-700'}>{t('toolsDisplayPercentage')}</p>
           </button>
           <button className="w-[80px] m-1 flex flex-col items-center"
                   onClick={() => typeof props.zoomReset === 'function' && props.zoomReset()}>
             <ScanSearchIcon className={props.zoomReset ? 'text-blue-500' : 'text-gray-500'}/>
-            <p className={'text-xs text-gray-700'}>{t('toolboxResetPosition')}</p>
+            <p className={'text-xs text-gray-700'}>{t('toolsResetPosition')}</p>
           </button>
         </div>
         <div className={'flex justify-between items-center'}>
           <button className="w-[80px] m-1 flex flex-col items-center" onClick={() => props.setShowFavorites(x => !x)}>
             <BookMarkedIcon className={'text-gray-700'}/>
-            <p className={'text-xs text-gray-700'}>{t('toolboxDisplayFavorites')}</p>
+            <p className={'text-xs text-gray-700'}>{t('toolsDisplayFavorites')}</p>
           </button>
           <button className="w-[80px] m-1 flex flex-col items-center" onClick={props.exitFullScreen}>
             <Minimize2Icon className={'text-gray-700'}/>
-            <p className={'text-xs text-gray-700'}>{t('toolboxExitFullScreen')}</p>
+            <p className={'text-xs text-gray-700'}>{t('toolsExitFullScreen')}</p>
           </button>
         </div>
       </div>
