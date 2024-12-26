@@ -52,7 +52,7 @@ export function DesktopFullscreenTools(props: Props) {
             <p className={'text-xs text-gray-700'}>{t('toolsDisplayPercentage')}</p>
           </button>
           <button className="w-[80px] m-1 flex flex-col items-center"
-                  onClick={() => typeof props.zoomReset === 'function' && props.zoomReset()}>
+            onClick={() => typeof props.zoomReset === 'function' && props.zoomReset()}>
             <ScanSearchIcon className={props.zoomReset ? 'text-blue-500' : 'text-gray-500'}/>
             <p className={'text-xs text-gray-700'}>{t('toolsResetPosition')}</p>
           </button>

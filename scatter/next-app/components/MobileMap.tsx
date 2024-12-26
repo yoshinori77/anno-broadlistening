@@ -144,37 +144,37 @@ function MobileMap(props: MapProps) {
           showLabels &&
           !zoom.dragging &&
           !isTouchDevice() && (
-            <div>
-              {clusters.map((cluster) => (
-                <div
-                  className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold ${isTouch ? 'text-base' : 'text-2xl'}`}
-                  key={cluster.cluster_id}
-                  style={{
-                    transform: 'translate(-50%, -50%)',
-                    left: zoom.zoomX(
-                      scaleX(
-                        mean(cluster.arguments.map(({x}) => x))
-                      )
-                    ),
-                    top: zoom.zoomY(
-                      scaleY(
-                        mean(cluster.arguments.map(({y}) => y))
-                      )
-                    ),
-                    color: color(cluster.cluster_id, onlyCluster),
-                    opacity:
+          <div>
+            {clusters.map((cluster) => (
+              <div
+                className={`absolute opacity-90 bg-white p-2 max-w-lg rounded-lg pointer-events-none select-none transition-opacity duration-300 font-bold ${isTouch ? 'text-base' : 'text-2xl'}`}
+                key={cluster.cluster_id}
+                style={{
+                  transform: 'translate(-50%, -50%)',
+                  left: zoom.zoomX(
+                    scaleX(
+                      mean(cluster.arguments.map(({x}) => x))
+                    )
+                  ),
+                  top: zoom.zoomY(
+                    scaleY(
+                      mean(cluster.arguments.map(({y}) => y))
+                    )
+                  ),
+                  color: color(cluster.cluster_id, onlyCluster),
+                  opacity:
                       expanded
                         ? 0.3
                         : tooltip?.cluster_id === cluster.cluster_id
                           ? 0
                           : 0.85,
-                  }}
-                >
-                  {t(cluster.cluster)}
-                </div>
-              ))}
-            </div>
-          )}
+                }}
+              >
+                {t(cluster.cluster)}
+              </div>
+            ))}
+          </div>
+        )}
         {/* TOOLTIP */}
         {tooltip && (
           <Tooltip

@@ -23,7 +23,7 @@ const Outline = ({clusters, translator}: Props) => {
       <Section name={t('Introduction')!} target="introduction"/>
       <Section name={t('Clusters')!} target="clusters"/>
       {clusters.map((cluster, i) => <Section small key={i} name={t(cluster.cluster)!}
-                                             target={'cluster-' + cluster.cluster_id}
+        target={'cluster-' + cluster.cluster_id}
       />)}
       <Section name={t('Appendix')!} target="appendix"/>
     </div>

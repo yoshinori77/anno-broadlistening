@@ -15,14 +15,14 @@ type Props = {
 }
 
 export function DesktopFullscreenFavorites({
-                                             favorites,
-                                             removeFavorite,
-                                             clusters,
-                                             translator,
-                                             color,
-                                             onlyCluster,
-                                             onClose
-                                           }: Props) {
+  favorites,
+  removeFavorite,
+  clusters,
+  translator,
+  color,
+  onlyCluster,
+  onClose
+}: Props) {
   return (
     <div
       className="absolute top-0 right-0 w-[400px] p-4 bg-gray-100 overflow-y-auto z-10 h-full shadow-md"

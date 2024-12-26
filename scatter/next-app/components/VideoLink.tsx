@@ -21,7 +21,7 @@ const VideoLink = ({video, timestamp, interview, showThumbnail, showVideo}: Vide
     {showThumbnail &&
       <img className="mt-2" width="320" height="240" src={`https://vumbnail.com/${videoId}.jpg`} alt=""/>}
     {showVideo && <iframe src={`https://player.vimeo.com/video/${videoId}#t=${totalSeconds}s`} width="320" height="240"
-                          allow="autoplay; fullscreen; picture-in-picture"></iframe>}
+      allow="autoplay; fullscreen; picture-in-picture"></iframe>}
   </div>
 }
 

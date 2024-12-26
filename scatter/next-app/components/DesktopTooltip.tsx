@@ -85,7 +85,7 @@ function Tooltip(props: TooltipProps) {
         {/* ツールチップの内容 */}
         <div style={{display: 'flex', alignItems: 'center'}}>
           <h3 style={{color: colorFunc(point.cluster_id), margin: 0}}
-              className="text-base sm:text-base md:text-base font-bold">
+            className="text-base sm:text-base md:text-base font-bold">
             {/* ラベルを大きくする */}
             {translator.t(point.cluster)}
           </h3>
