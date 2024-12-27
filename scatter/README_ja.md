@@ -57,6 +57,39 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+
+本プロジェクトはPython 3.10での動作を推奨しています。Python 3.12を使用すると、以下のようなエラーが発生する場合があります：
+
+```
+ModuleNotFoundError: No module named 'distutils'
+```
+
+このエラーを回避するために、pyenvを使用してPython 3.10をインストールすることができます。以下の手順で環境をセットアップしてください：
+
+1. pyenvのインストール（まだインストールしていない場合）:
+```bash
+curl https://pyenv.run | bash
+```
+
+2. pyenvの設定をシェルに追加（.bashrcや.zshrcに以下を追加）:
+```bash
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+```
+
+3. Python 3.10のインストールと設定:
+```bash
+pyenv install 3.10
+pyenv local 3.10
+```
+
+4. 依存パッケージのインストール:
+```bash
+pip install -r scatter/requirements.txt
+```
+
+
 #### javascript環境の構築
 ```
 cd next-app
