@@ -113,21 +113,58 @@ export OPENAI_API_KEY=sk-...
 python main.py configs/my-project.json
 ```
 
-## Viewing the generated report
+## Building and viewing the report
 
-The generated report can be found under `pipeline/outputs/my-project/report` and opened locally using an http server run from the project's top level directory:
+### Building the report
 
+The report can be built using Next.js with the REPORT environment variable:
+
+```bash
+cd next-app
+REPORT=<report-name> npm run build
 ```
+
+For example, to build the example report:
+```bash
+REPORT=example-polis npm run build
+```
+
+The built report will be generated in `pipeline/outputs/<report-name>/report` directory.
+
+### Viewing the generated report
+
+There are two ways to view the generated report:
+
+#### 1. Using Python's built-in HTTP server (Recommended)
+
+The simplest way to view the report is using Python's built-in HTTP server:
+
+```bash
+cd pipeline/outputs/<report-name>/report
+python -m http.server 8000
+```
+
+Then open `http://localhost:8000` in your browser.
+
+#### 2. Using Node.js http-server
+
+Alternatively, you can use Node.js http-server from the project's top level directory:
+
+```bash
 npm install -g http-server
 http-server -p 8080
-open http://localhost:8080/pipeline/outputs/my-project/report/
 ```
 
-Replace "my-project" above with "example" to view the example report.
+Then open `http://localhost:8080/pipeline/outputs/<report-name>/report/` in your browser.
 
-You can then deploy your report using any static hosting service (e.g. Vercel).
+Replace "<report-name>" in the above commands with your project name (e.g., "example-polis", "my-project", etc.).
 
-(!) Note that the html file is loading assets using relative paths. You can deploy your report anywhere (on any path/route) but you might need to include a trailing slash at the end of you urls to make sure that relative paths are resolved correctly.
+### Deploying the report
+
+You can deploy your report using any static hosting service (e.g. Vercel).
+
+(!) Note that the html file is loading assets using relative paths. You can deploy your report anywhere (on any path/route) but you might need to include a trailing slash at the end of your urls to make sure that relative paths are resolved correctly.
+
 
 ## Supported columns in the csv
 
@@ -235,6 +272,24 @@ outputs
 
 Note that `result.json` contains a copy of all the generated data, including the contents of `args.csv`, `clusters.csv` and `labels.csv` and `translations.json`.
 These files are only kep around for caching purposes, just in case you want to re-run the pipeline with slightly different parameters and don't need to recompute everything.
+
+
+## Known Issues and Troubleshooting
+
+### Environment Setup
+
+#### Python Environment
+- We recommend using Python 3.10+ with a virtual environment
+- If you encounter OpenAI client configuration issues (e.g., proxy-related errors), check the `KNOWN_ISSUES.md` file for workarounds
+- Make sure your environment variables (especially `OPENAI_API_KEY`) are properly set
+
+#### Build and Serving Issues
+- If `next start` fails to serve the built site, use Python's HTTP server as described in the "Viewing the generated report" section
+- The build output directory changes based on the `REPORT` environment variable, always check `pipeline/outputs/<report-name>/report` for the latest build
+- Large page sizes are expected due to embedded analysis results
+
+For more detailed information about known issues and their workarounds, please refer to `KNOWN_ISSUES.md`.
+
 
 ## Credits
 
