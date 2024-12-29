@@ -14,8 +14,8 @@ Each section below contains detailed information about the changes, including re
 - Fixed circle overlap issues in visualization / 可視化における円の重なり問題を修正
 - Improved readability of dense data points / 密集したデータポイントの可読性向上
 - Commits: 
-  - 12ad649 - "Fixes #10 #13 - fix collision detection" / 衝突検出の修正
-  - 2f90613 - "Fixes #10 #13 - fix collision detection" / 衝突検出の修正
+  - @12ad649 - "Fixes #10 #13 - fix collision detection" / 衝突検出の修正
+  - https://github.com/takahiroanno2024/anno-broadlistening/commit/2f90613 - "Fixes #10 #13 - fix collision detection" / 衝突検出の修正
 
 ### Favorite List / お気に入りリスト
 - Added ability to bookmark important items / 重要なアイテムをブックマークする機能を追加
