@@ -38,14 +38,23 @@ For this you will need:
 - a machine to run python and javascript
 - your data in a csv file
 
-We recommend to use python 3.10+ and install the dependencies as follows:
+We require Python 3.10+ for compatibility reasons. We recommend using pyenv for Python version management:
 
-```
+```bash
+# Install Python 3.10 using pyenv
+pyenv install 3.10.15
+pyenv local 3.10.15
+
+# Create and activate virtual environment
 python -m venv venv
 source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 python -c "import nltk; nltk.download('stopwords')"
 ```
+
+Note: The pipeline generates various temporary files (embeddings, clusters, etc.) in the outputs directory. These files are automatically ignored by git and can be safely deleted as they will be regenerated when needed.
 
 You'll also need npm to installed the javascript dependencies:
 
