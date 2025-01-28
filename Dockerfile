@@ -5,12 +5,10 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # 必要なシステムパッケージをインストール
-RUN apt-get update && apt-get install -y \\
-    curl \\
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl gcc build-essential && rm -rf /var/lib/apt/lists/*
 
 # Node.jsをインストール
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \\
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y nodejs
 
 # プロジェクトのファイルをコピー
@@ -29,4 +27,4 @@ RUN python -c "import nltk; nltk.download('stopwords')"
 ENV OPENAI_API_KEY=your_openai_api_key_here
 
 # パイプラインを実行し、レポートを生成
-CMD ["bash", "-c", "cd scatter/pipeline && python main.py configs/example-polis.json && cd ../next-app && REPORT=example-polis npm run build && cd ../pipeline/outputs/example-polis/report && python -m http.server 8000"]
+CMD ["bash", "-c", "cd scatter/pipeline && python main.py configs/example-polis.json --skip-interaction && cd outputs/example-polis/report && python -m http.server 8000"]

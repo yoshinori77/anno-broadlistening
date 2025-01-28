@@ -17,33 +17,15 @@
 
 - OpenAIのAPIキー
 - PythonとJavaScriptを実行できるマシン
-- コメントを含むCSVファイル
 
 Python 3.10以上が必要です。Pythonのバージョン管理にはpyenvを使用することをお勧めします。
 
 ## Windowsユーザ向けDockerセットアップ
 
-WindowsユーザはDockerを使用して簡単に環境をセットアップできます。以下の手順に従ってください。
+WindowsユーザはMacやLinuxと比較して環境構築で迷いやすいです。Dockerを使用して比較的マシに環境をセットアップできます。
+[Windowsユーザ向けDockerセットアップ](for_windows_user.md)を参照。
 
-1. **Dockerのインストール**
-   - Docker Desktopをインストールし、起動します。
-
-2. **Dockerイメージのビルド**
-   - プロジェクトのルートディレクトリで以下のコマンドを実行してDockerイメージをビルドします。
-
-   ```bash
-   docker build -t broadlistening .
-   ```
-
-3. **Dockerコンテナの起動**
-   - 以下のコマンドを実行してDockerコンテナを起動し、レポートを生成します。
-
-   ```bash
-   docker run -p 8000:8000 broadlistening
-   ```
-
-   ブラウザで`http://localhost:8000`を開き、生成されたレポートを確認します。
-
+## その他の環境でのセットアップ
 
 1. **Python環境のセットアップ**
    - Python 3.10をインストールし、仮想環境を作成してアクティブ化します。
@@ -77,13 +59,7 @@ WindowsユーザはDockerを使用して簡単に環境をセットアップで�
 
    このコマンドは、`pipeline/inputs/example-polis.csv`のデータを使用し、`pipeline/outputs/example-polis/report`にレポートを生成します。
 
-4. **レポートのビルドと表示**
-   - Next.jsを使用してレポートをビルドします。
-
-   ```bash
-   cd next-app
-   REPORT=example-polis npm run build
-   ```
+4. **レポートの表示**
 
    - PythonのHTTPサーバーを使用してレポートを表示します。
 
