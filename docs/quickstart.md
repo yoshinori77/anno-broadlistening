@@ -16,9 +16,7 @@
 ## 必要なもの
 
 - OpenAIのAPIキー
-- PythonとJavaScriptを実行できるマシン
 
-Python 3.10以上が必要です。Pythonのバージョン管理にはpyenvを使用することをお勧めします。
 
 ## Windowsユーザ向けDockerセットアップ
 
@@ -27,45 +25,63 @@ WindowsユーザはMacやLinuxと比較して環境構築で迷いやすいで�
 
 ## その他の環境でのセットアップ
 
-1. **Python環境のセットアップ**
-   - Python 3.10をインストールし、仮想環境を作成してアクティブ化します。
-   - 必要な依存関係をインストールします。
+### **Python環境のセットアップ**
 
-   ```bash
-   pyenv install 3.10.15
-   pyenv local 3.10.15
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   python -c "import nltk; nltk.download('stopwords')"
-   ```
+Python 3.10以上が必要です。Pythonのバージョン管理にはpyenvを使用することをお勧めします。
 
-2. **JavaScript依存関係のインストール**
-   - npmを使用してJavaScriptの依存関係をインストールします。
+Python 3.10をインストールし、仮想環境を作成してアクティブ化します。
 
-   ```bash
-   cd next-app
-   npm install
-   ```
+必要な依存関係をインストールします。
 
-3. **レポートの生成**
-   - サンプルの`example-polis`データを使用して試してみましょう。
+```bash
+pyenv install 3.10.15
+pyenv local 3.10.15
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python -c "import nltk; nltk.download('stopwords')"
+```
 
-   ```bash
-   cd pipeline
-   export OPENAI_API_KEY=sk-...
-   python main.py configs/example-polis.json
-   ```
+### **JavaScript依存関係のインストール**
+npmを使用してJavaScriptの依存関係をインストールします。
 
-   このコマンドは、`pipeline/inputs/example-polis.csv`のデータを使用し、`pipeline/outputs/example-polis/report`にレポートを生成します。
+```bash
+cd next-app
+npm install
+```
 
-4. **レポートの表示**
+### **環境変数の設定**
+プロジェクトのルートディレクトリで`.env`ファイルを作成します。`.env.example`ファイルをコピーして編集すると良いでしょう。
+以下のような内容になります。
 
-   - PythonのHTTPサーバーを使用してレポートを表示します。
+```
+OPENAI_API_KEY=<your_openai_api_key_here>
+```
 
-   ```bash
-   cd pipeline/outputs/example-polis/report
-   python -m http.server 8000
-   ```
+### **レポートの生成**
+サンプルの`example-polis`データを使用して試してみましょう。
 
-   ブラウザで`http://localhost:8000`を開きます。
+```bash
+cd pipeline
+python main.py configs/example-polis.json
+```
+
+このコマンドは、`pipeline/inputs/example-polis.csv`のデータを使用し、`pipeline/outputs/example-polis/report`にレポートを生成します。
+
+### **レポートの表示**
+
+PythonのHTTPサーバーを使用してレポートを表示します。
+
+```bash
+cd pipeline/outputs/example-polis/report
+python -m http.server 8000
+```
+
+ブラウザで`http://localhost:8000`を開きます。
+
+### API費用の確認
+OpenAIのUsege画面を見るとかかった費用がわかります。
+
+![](images/usage.png)
+
+この処理では1〜2円程度であることがわかります。
