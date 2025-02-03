@@ -6,23 +6,29 @@ FROM python:3.10-slim AS builder
 WORKDIR /app
 
 # 必要なシステムパッケージをインストール
-RUN apt-get update && apt-get install -y curl gcc build-essential && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends curl gcc build-essential && rm -rf /var/lib/apt/lists/*
 
-# Node.jsをインストール
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs
+# uv（Rust製のPythonパッケージマネージャー）のインストール
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# プロジェクトのファイルをコピー
+# 依存関係管理ファイル（pyproject.toml と uv.lock）をコピー
+COPY pyproject.toml uv.lock ./
+
+# システムの Python 環境に依存関係をインストールするための設定
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
+
+# システムの Python にインストール
+RUN uv sync --locked
+
+# 残りの全てのソースコードをコピー
 COPY . .
 
-# Pythonの依存関係をインストール
-RUN pip install --no-cache-dir -r scatter/requirements.txt
-
-# JavaScriptの依存関係をインストール
-RUN cd scatter/next-app && npm install
+ENV NLTK_DATA=/app/nltk_data
 
 # NLTKのデータをダウンロード
-RUN python -c "import nltk; nltk.download('stopwords')"
+RUN python -c "import nltk; nltk.download('stopwords', download_dir='/app/nltk_data')"
 
 # 環境変数を設定
 ENV OPENAI_API_KEY=your_openai_api_key_here
