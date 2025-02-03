@@ -44,6 +44,17 @@ COPY --from=builder /app /app
 # ビルダーでインストールされたPythonパッケージをコピー
 COPY --from=builder /usr/local/lib/python3.10 /usr/local/lib/python3.10
 
+# curl と Node.js をインストール
+RUN --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends curl \
+    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get update && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# 依存関係をインストール
+RUN --mount=type=cache,target=/root/.npm npm ci --prefix scatter/next-app
+
 
 # パイプラインを実行し、レポートを生成
 CMD ["bash", "-c", "cd scatter/pipeline && python main.py configs/example-polis.json --skip-interaction && cd outputs/example-polis/report && python -m http.server 8000"]
