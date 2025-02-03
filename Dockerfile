@@ -1,5 +1,6 @@
-# ベースイメージとしてPythonとNode.jsを含むイメージを使用
-FROM python:3.10-slim
+# syntax=docker/dockerfile:1
+# ベースイメージとしてPythonを含むイメージを使用
+FROM python:3.10-slim AS builder
 
 # 作業ディレクトリを設定
 WORKDIR /app
