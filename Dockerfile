@@ -59,5 +59,8 @@ RUN --mount=type=cache,target=/root/.npm npm ci --prefix scatter/next-app
 RUN chown -R appuser:appuser /app
 USER appuser
 
+# 実行ポート
+EXPOSE 8000
+
 # パイプラインを実行し、レポートを生成
 CMD ["bash", "-c", "cd scatter/pipeline && python main.py configs/example-polis.json --skip-interaction && cd outputs/example-polis/report && python -m http.server 8000"]
