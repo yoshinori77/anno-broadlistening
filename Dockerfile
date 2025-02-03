@@ -30,8 +30,14 @@ ENV NLTK_DATA=/app/nltk_data
 # NLTKのデータをダウンロード
 RUN python -c "import nltk; nltk.download('stopwords', download_dir='/app/nltk_data')"
 
-# 環境変数を設定
-ENV OPENAI_API_KEY=your_openai_api_key_here
+# 実行用イメージを作成
+FROM python:3.10-slim AS runner
+
+WORKDIR /app
+
+# 非rootユーザーを作成
+RUN groupadd --system appuser && useradd --system --gid appuser appuser
+
 
 # パイプラインを実行し、レポートを生成
 CMD ["bash", "-c", "cd scatter/pipeline && python main.py configs/example-polis.json --skip-interaction && cd outputs/example-polis/report && python -m http.server 8000"]
