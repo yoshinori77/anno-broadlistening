@@ -38,6 +38,12 @@ WORKDIR /app
 # 非rootユーザーを作成
 RUN groupadd --system appuser && useradd --system --gid appuser appuser
 
+# Builder ステージから必要なファイルをコピー
+COPY --from=builder /app /app
+
+# ビルダーでインストールされたPythonパッケージをコピー
+COPY --from=builder /usr/local/lib/python3.10 /usr/local/lib/python3.10
+
 
 # パイプラインを実行し、レポートを生成
 CMD ["bash", "-c", "cd scatter/pipeline && python main.py configs/example-polis.json --skip-interaction && cd outputs/example-polis/report && python -m http.server 8000"]
