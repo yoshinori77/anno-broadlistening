@@ -55,6 +55,9 @@ RUN --mount=type=cache,target=/var/lib/apt \
 # 依存関係をインストール
 RUN --mount=type=cache,target=/root/.npm npm ci --prefix scatter/next-app
 
+# 作業ディレクトリの所有権を調整
+RUN chown -R appuser:appuser /app
+USER appuser
 
 # パイプラインを実行し、レポートを生成
 CMD ["bash", "-c", "cd scatter/pipeline && python main.py configs/example-polis.json --skip-interaction && cd outputs/example-polis/report && python -m http.server 8000"]
